@@ -59,11 +59,11 @@ The IMAGE_THUNK_DATA structures contain either the ordinal of the imported API o
 
 Here is a schema presenting what it looks like before the binary is fully loaded:
 
-![imports1](/assets/2022-01-25-inside-import-address-filtering/peimports1.PNG)
+![imports1](/assets/imgs/2022-01-25-inside-import-address-filtering/peimports1.PNG)
 
 When a function is resolved by the loader, it will overwrite the associated IMAGE_THUNK_DATA  inside the *RealImport array* with the real value of its address in the program address space. Here is what it becomes:
 
-![imports2 ](/assets/2022-01-25-inside-import-address-filtering/peimports2.PNG)
+![imports2 ](/assets/imgs/2022-01-25-inside-import-address-filtering/peimports2.PNG)
 
 
 In the end, (for the sake of simplicity), all *RealImports arrays*, and as such the *import address table*, will contain all the addresses of all imported functions. The binary has just to call the address present at the correct offset inside the *import address table* to call the associated function from any Dll.
@@ -211,7 +211,7 @@ IAF is setup in 4 steps:
 
      Here is a schema indicating what it looks like:
 
-      ![IAF layout](/assets/2022-01-25-inside-import-address-filtering/IAF.PNG)
+      ![IAF layout](/assets/imgs/2022-01-25-inside-import-address-filtering/IAF.PNG)
 
 
 
