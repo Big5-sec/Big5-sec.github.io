@@ -215,7 +215,7 @@ IAF is setup in 4 steps:
 
 
 
-  4. When the entry point of the application is reached, due to the hook, the function ``MitLibActivateProtections`` is called. This function sets up a new ExceptionHandler (that will be used to catch accesses to guard pages), ensures all memory locations within modules that should be set with PAGE_GUARD right are set correspondingly (primarily used by EAF), and finally it sets the memory rights of *the IAFShadowMemory* to PAGE_GUARD|READ_ONLY.
+  4. When the entry point of the application is reached, due to the hook, the function ``MitLibActivateProtections`` is called. This function sets up a new ExceptionHandler (that will be used to catch accesses to guard pages), ensures all memory locations within modules that should be set with PAGE_GUARD right are set correspondingly (primarily used by EAF), and finally it sets the memory rights of *the IAFShadowMemory* to PAGE_GUARD\|READ_ONLY.
 
 
 ### IAF processing
