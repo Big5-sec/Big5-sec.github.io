@@ -15,7 +15,7 @@ For a course I teach, I wanted to present the modern mitigations one can encount
   - Import Address Filtering (IAF)
   - Export Address Filtering (EAF)
 
-One of my students asked me how those mitigations really work. While Microsoft explains quite extensively its mitigations within this [document](github.com/MicrosoftDocs/microsoft-365-docs/blob/public/microsoft-365/security/defender-endpoint/exploit-protection-reference.md), their internals are still quite obscure. 
+One of my students asked me how those mitigations really work. While Microsoft explains quite extensively its mitigations within this [document](https://github.com/MicrosoftDocs/microsoft-365-docs/blob/public/microsoft-365/security/defender-endpoint/exploit-protection-reference.md), their internals are still quite obscure. 
 
 Moreover, past references that go into details appear to be quite outdated, as they were principally referencing EMET, which is now deprecated. For exemple, at that time, EMET was using hardware breakpoints instead of guard pages:
 
