@@ -64,7 +64,7 @@ Here is a schema presenting what it looks like before the binary is fully loaded
 
 When a function is resolved by the loader, it will overwrite the associated IMAGE_THUNK_DATA  inside the *RealImport array* with the real value of its address in the program address space. Here is what it becomes:
 
-![imports2 ](/assets/img/2022-01-25-inside-import-address-filtering/peimports2.PNG)
+![imports2 ](peimports2.PNG)
 
 
 In the end, (for the sake of simplicity), all *RealImports arrays*, and as such the *import address table*, will contain all the addresses of all imported functions. The binary has just to call the address present at the correct offset inside the *import address table* to call the associated function from any Dll.
@@ -74,7 +74,7 @@ In the end, (for the sake of simplicity), all *RealImports arrays*, and as such 
 
 When I said that attackers can parse imports to resolve a function address inside a shellcode, here is an example C code. Once compiled, it could be used as a shellcode, resolving ``VirtualAlloc`` address in a generic manner :
 
-``` C
+```C
 uintptr_t getVirtualAllocAddress()
 {
 	char expectedDllName[] = { 'K', 'E', 'R', 'N', 'E', 'L', '3','2','\0' };
@@ -212,7 +212,7 @@ IAF is setup in 4 steps:
 
      Here is a schema indicating what it looks like:
 
-      ![IAF layout]({{ site.baseurl }}/assets/img/2022-01-25-inside-import-address-filtering/IAF.PNG)
+      ![IAF layout](IAF.PNG)
 
 
 
