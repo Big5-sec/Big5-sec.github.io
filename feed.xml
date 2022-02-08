@@ -1,0 +1,101 @@
+
+
+<feed xmlns="http://www.w3.org/2005/Atom">
+  <id>https://big5-sec.github.io/</id>
+  <title>yar-eb</title>
+  <subtitle>A personal blog about reverse, pwn and security</subtitle>
+  <updated>2022-02-08T01:25:57+01:00</updated>
+  <author>
+    <name>your_full_name</name>
+    <uri>https://big5-sec.github.io/</uri>
+  </author>
+  <link rel="self" type="application/atom+xml" href="https://big5-sec.github.io/feed.xml"/>
+  <link rel="alternate" type="text/html" hreflang="en"
+    href="https://big5-sec.github.io/"/>
+  <generator uri="https://jekyllrb.com/" version="4.2.1">Jekyll</generator>
+  <rights> © 2022 your_full_name </rights>
+  <icon>/assets/img/favicons/favicon.ico</icon>
+  <logo>/assets/img/favicons/favicon-96x96.png</logo>
+
+
+  
+  <entry>
+    <title>An analysis of CVE-2022-21877</title>
+    <link href="https://big5-sec.github.io/posts/an-analysis-of-cve-2022-21877/" rel="alternate" type="text/html" title="An analysis of CVE-2022-21877" />
+    <published>2022-01-25T22:57:40+01:00</published>
+  
+    <updated>2022-01-25T22:57:40+01:00</updated>
+  
+    <id>https://big5-sec.github.io/posts/an-analysis-of-cve-2022-21877/</id>
+    <content src="https://big5-sec.github.io/posts/an-analysis-of-cve-2022-21877/" />
+    <author>
+      <name>your_full_name</name>
+    </author>
+
+  
+    
+  
+
+  
+    <summary>
+      
+
+
+
+
+
+      Introduction
+
+I wanted to have some fun on patch diffing : on the latest “patch tuesday” update, Microsoft released a patch for an information disclosure vulnerability in the storage spaces controller. This vulnerability has been found by Quang Linh, working at STAR Labs.  Because leaking information is often easier than a full blown RCE/LPE exploit, I selected this vuln because it would take l...
+    </summary>
+  
+
+  </entry>
+
+  
+  <entry>
+    <title>Inside Import Address Filtering</title>
+    <link href="https://big5-sec.github.io/posts/inside-import-address-filtering/" rel="alternate" type="text/html" title="Inside Import Address Filtering" />
+    <published>2021-11-13T22:57:40+01:00</published>
+  
+    <updated>2022-02-08T01:18:35+01:00</updated>
+  
+    <id>https://big5-sec.github.io/posts/inside-import-address-filtering/</id>
+    <content src="https://big5-sec.github.io/posts/inside-import-address-filtering/" />
+    <author>
+      <name>your_full_name</name>
+    </author>
+
+  
+    
+  
+
+  
+    <summary>
+      
+
+
+
+
+
+      Short Intro and past references
+
+For a course I teach, I wanted to present the modern mitigations one can encounter on Windows. I focused on those aimed at preventing shellcode execution and ROP, because this course was on stack buffer overflows. Namely, the interesting ones are:
+
+
+  Stackpivot
+  CallerCheck
+  SimExec
+  Import Address Filtering (IAF)
+  Export Address Filtering (EAF)
+
+
+One of my...
+    </summary>
+  
+
+  </entry>
+
+</feed>
+
+
