@@ -1,0 +1,279 @@
+I"�J<h2 id="introduction">Introduction</h2>
+
+<p>I wanted to have some fun on patch diffing : on the latest “patch tuesday” update, Microsoft released a patch for an information disclosure vulnerability in the storage spaces controller. This vulnerability has been found by <a href="https://twitter.com/linhlhq">Quang Linh</a>, working at <a href="https://twitter.com/starlabs_sg">STAR Labs</a>.  Because leaking information is often easier than a full blown RCE/LPE exploit, I selected this vuln because it would take less time to analyze on my spare time. The following article will be organized as follows:</p>
+<ul>
+  <li><a href="#patch-diffing-and-discovery">patch diffing and discovery</a></li>
+  <li><a href="#triggering-it">triggering it</a></li>
+  <li><a href="#getting-a-controlled-leak">getting a controlled leak?</a></li>
+  <li><a href="#conclusion">conclusion</a></li>
+  <li><a href="#a-bit-of-spaceportsys-documentation">some spaceport.sys documentation</a></li>
+</ul>
+
+<h2 id="patch-diffing-and-discovery">Patch diffing and discovery</h2>
+
+<p>The first question to answer is : where should I look at? Indeed, Windows bulletins are now more abstract than ever. Fortunately, <a href="https://www.synacktiv.com/sites/default/files/2021-10/2021_sthack_windows_lpe.pdf">previous vulnerabilities found on this component by Fabien Periguaud</a>(<a href="https://twitter.com/0xf4b">@0xf4b</a>) and the <a href="https://www.zerodayinitiative.com/advisories/ZDI-22-048/">ZDI bulletin</a> both point to look at the <code class="language-plaintext highlighter-rouge">spaceport.sys</code> driver. I got the december and january versions of this driver, loaded it in IDA, and used <a href="https://www.zynamics.com/bindiff.html">bindiff</a> to look for the modified code. Here are the results:</p>
+<ul>
+  <li>no difference in unmatched functions</li>
+  <li>3 changed function in the “matched functions” window, which is nice from an analysis point of view (<code class="language-plaintext highlighter-rouge">SpIoctlCreateTier</code>, <code class="language-plaintext highlighter-rouge">SP_POOL::SetTierInfo</code>, <code class="language-plaintext highlighter-rouge">SP_POOL::SetSpaceInfoTransaction</code>):</li>
+</ul>
+
+<p><img src="bindiff.PNG" alt="bindiff" /></p>
+
+<p>Only by looking at the names, one can see the vulnerability seems related to <code class="language-plaintext highlighter-rouge">Tier</code> object. Let’s analyse the changes further. In the <code class="language-plaintext highlighter-rouge">SpIoctlCreateTier</code> function, the following code has been changed (you need to open the image in another tab for now):</p>
+
+<p><img src="patched_unpatched.PNG" alt="codediff" /></p>
+
+<p>First, Microsoft introduced a safe addition ensuring no integer overflow occurs. The members of this addition are the offset where GUIDs should be copied from the IRP’s system buffer, and the total size taken by those GUIDs. Furthermore, the result of this operation is checked against the total length field of the IRP’s system buffer written inside the said buffer. (A check at the beginning of the function ensures this length is indeed equal to the length of the IRP’s buffer.)</p>
+
+<p>In the <code class="language-plaintext highlighter-rouge">SpIdsCopyHelper</code> function called afterwards, memory is allocated with a size corresponding to the total size taken by the GUIDs, and the GUIDs pointed by the given offset are then copied into this newly allocated memory. This allocated memory is then integrated within the <code class="language-plaintext highlighter-rouge">SDB_TIER</code> object created. This <code class="language-plaintext highlighter-rouge">SDB_TIER</code> object itself is registered inside an <code class="language-plaintext highlighter-rouge">SDB_POOL_CONFIG</code> object, and it finally gets destroyed.</p>
+
+<p>Before the patch, by providing a malicious offset inside the buffer, one could copy content of memory outside of the IRP’s system buffer into the <code class="language-plaintext highlighter-rouge">SDB_TIER</code> object:</p>
+
+<p><img src="vuln.PNG" alt="vuln" /></p>
+
+<p>The remaining two patched functions are also patched in the same way. Once again, it was possible to give an arbitrary offset inside the IRP buffer leading to the same problem.</p>
+
+<h2 id="triggering-it">Triggering it</h2>
+
+<p>From the little analysis made on previous paragraph, here are the necessary steps to trigger the vulnerability:</p>
+
+<ol>
+  <li>Ensure we have a pool on the machine : this is automatically done by Microsoft once you have three disks on the machine. If I’m not mistaken, you cannot create pool while there are less disks.</li>
+  <li>Call one of those function that permits to leak memory</li>
+  <li>retrieve the leaked memory that has been registered inside the <code class="language-plaintext highlighter-rouge">SDB_POOL_CONFIG</code> object. This can be done by calling <code class="language-plaintext highlighter-rouge">SpIoctlGetTierInfo</code> or <code class="language-plaintext highlighter-rouge">SpIoctlgetSpaceInfo</code> respectively to the function used to leak memory.</li>
+</ol>
+
+<p>Unfortunately, the step 2 is protected by two checks:</p>
+
+<p><img src="access_checks.PNG" alt="accesschecks" /></p>
+
+<p>First, one needs a valid pool ID. This is not a problem : pools’ IDs can be listed using <code class="language-plaintext highlighter-rouge">SpIoctlGetPools</code>, which is not protected from a standard user. Second, one needs to pass the <code class="language-plaintext highlighter-rouge">SpAccessCheckPool</code> function, which -as its name suggests- checks if you have the necessary rights to do the operation. This function in fact checks against the <code class="language-plaintext highlighter-rouge">SpControlExt</code> object’s security descriptor if the current context of the operation has the valid right (the access mask associated with the underlying <code class="language-plaintext highlighter-rouge">SeAccessCheck</code> function is <code class="language-plaintext highlighter-rouge">TOKEN_MANDATORY_POLICY_VALID_MASK</code>). In my tests, the access is validated for the local administrators group and the system account. As a simple user, we cannot trigger the vulnerability… Nevermind, with that information, time to trigger the vulnerability!</p>
+
+<p>You can find the associated code within this <a href="https://github.com/Big5-sec/cve-2022-21877">github repository</a>. To be able to run the code, you need to be administrator and to give the name of a pool for whom a tier can be created (tiers cannot be created on the primordial pool apparently).</p>
+
+<h2 id="getting-a-controlled-leak">Getting a controlled leak?</h2>
+
+<p>One of the question that arises from the vulnerability is: can it be used to leak a given kernel object of interest? Here are a few observations obtained through the use of Windbg (whose results are to be taken with caution because I did not go deep in the reverse of this part):</p>
+<ul>
+  <li>The system buffer appears to be allocated in the NonPagedPoolNxCacheAligned pool.</li>
+  <li>Whenever I checked the buffer, it seems to be aligned on a page. Because I was able to get the same leak randomly, it may seems this page is taken from a pool of pages for Io operations. Perhaps there is some kind of lookaside list in the Io manager?</li>
+  <li>This page appears to be formed of the chunk corresponding to the system buffer, and then empty/free space.</li>
+</ul>
+
+<p>I also tried quickly to allocate pool blocks, and then freed particular ones, in order to create holes that could be used by the IRP buffer. This test was a fail, but it may be due to the test itself that was badly executed.</p>
+
+<p>So in the end, I have no idea if it’s possible to get a given object behind the buffer of an IRP. Perhaps people like Yarden Shafir, Corentin Bayet or guys of KunlunLab would know. If so, I would love to hear about it. Anyway, I’ll certainly go back to this for a future post.</p>
+
+<h2 id="conclusion">Conclusion</h2>
+
+<p>Because one needs to be already in the local administrators group to trigger the vulnerability, its real impact appears low. Indeed, from an attacker perspective, this vulnerability appears useless as a mean to gain more information than what the attacker could already get with his rights. However, this is still a a somewhat memory corruption vulnerability that got corrected here, and it may prevent the introduction of the same vulnerable pattern inside spaceport.sys in the future.</p>
+
+<h2 id="a-bit-of-spaceportsys-documentation">A bit of <code class="language-plaintext highlighter-rouge">spaceport.sys</code> documentation</h2>
+
+<p>The following documentation was obtained through reverse engineering, in order to trigger the leak. Given the low impact of this vulnerability, I did not bother to go deep in the reverse and as such the following documentation is quite harsh. Please be indulgent.</p>
+
+<ul>
+  <li>SpIoctlGetPools:
+    <ul>
+      <li>purpose : lists all the pools on the machine</li>
+      <li>IOCTL code: 0xE70004</li>
+      <li>input: an empty buffer whose length is at least equal to 4 bytes.</li>
+      <li>output : a structure like the following, where N is equal to the number of pools on the machine</li>
+    </ul>
+
+    <div class="language-c highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><!-- <td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+</pre></td> --><td class="rouge-code"><pre><span class="k">typedef</span> <span class="k">struct</span> <span class="p">{</span>
+    <span class="n">ULONG</span> <span class="n">nbPools</span><span class="p">;</span>      <span class="c1">// == N</span>
+    <span class="n">GUID</span> <span class="n">listGuids</span><span class="p">[</span><span class="n">N</span><span class="p">];</span>  <span class="c1">// a list of all the pools' GUIDs</span>
+<span class="p">}</span> <span class="n">POOLSLIST</span><span class="p">,</span> <span class="o">*</span><span class="n">PPOOLSLIST</span><span class="p">;</span>
+</pre></td></tr></tbody></table></code></pre></div>    </div>
+  </li>
+  <li>SpIoctlGetPoolInfo
+    <ul>
+      <li>purpose : get the information about a pool</li>
+      <li>IOCTL code: 0xE70008</li>
+      <li>no particular access check</li>
+      <li>
+        <p>input:</p>
+
+        <p>a buffer whose size is superior to 0x28, with the following fields:</p>
+        <ul>
+          <li>the input buffer size, equal to 0x28, as a dword at offset 0</li>
+          <li>the pool GUID at offset 4</li>
+        </ul>
+
+        <p>This is equivalent to fill in the two fields size and poolGUID in the same structure than for output.</p>
+      </li>
+      <li>output: the following structure:</li>
+    </ul>
+
+    <div class="language-c highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><!-- <td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+</pre></td> --><td class="rouge-code"><pre><span class="k">typedef</span> <span class="k">struct</span>
+<span class="p">{</span>
+  <span class="kt">int</span> <span class="n">size</span><span class="p">;</span>
+  <span class="n">GUID</span> <span class="n">poolGUID</span><span class="p">;</span>
+  <span class="kt">int</span> <span class="n">field_14</span><span class="p">;</span>
+  <span class="kt">wchar_t</span> <span class="n">friendlyName</span><span class="p">[</span><span class="mi">256</span><span class="p">];</span>
+  <span class="kt">wchar_t</span> <span class="n">description</span><span class="p">[</span><span class="mi">1024</span><span class="p">];</span>
+  <span class="kr">__int16</span> <span class="n">field_A18</span><span class="p">;</span>        <span class="c1">//because needs more reversing</span>
+  <span class="n">BYTE</span> <span class="n">gapA1A</span><span class="p">[</span><span class="mi">82</span><span class="p">];</span>          <span class="c1">//because needs more reversing</span>
+  <span class="kt">int</span> <span class="n">thinProvisioningAlertThresholds</span><span class="p">;</span>
+  <span class="n">BYTE</span> <span class="n">gapA70</span><span class="p">[</span><span class="mi">143</span><span class="p">];</span>         <span class="c1">//because needs more reversing</span>
+  <span class="kt">char</span> <span class="n">field_AFF</span><span class="p">;</span>           <span class="c1">//because needs more reversing</span>
+<span class="p">}</span><span class="n">POOLINFO</span><span class="p">,</span> <span class="o">*</span><span class="n">PPOOLINFO</span><span class="p">;</span>
+</pre></td></tr></tbody></table></code></pre></div>    </div>
+  </li>
+  <li>SpIoctlCreateTier
+    <ul>
+      <li>purpose : to create a tier associated with a pool (to be fair, I still don’t know what is a tier)</li>
+      <li>available from local administrators group and system</li>
+      <li>IOCTL code: 0xE7D410</li>
+      <li>
+        <p>input:
+a structure like the following:</p>
+
+        <div class="language-c highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><!-- <td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+</pre></td> --><td class="rouge-code"><pre><span class="k">typedef</span> <span class="k">struct</span>
+<span class="p">{</span>
+  <span class="kt">int</span> <span class="n">length_bis</span><span class="p">;</span>
+  <span class="kt">int</span> <span class="n">length</span><span class="p">;</span>
+  <span class="n">GUID</span> <span class="n">PoolGUID</span><span class="p">;</span>
+  <span class="n">GUID</span> <span class="n">TierGUID</span><span class="p">;</span>
+  <span class="n">GUID</span> <span class="n">spaceGUID</span><span class="p">;</span>
+  <span class="kt">wchar_t</span> <span class="n">friendlyName</span><span class="p">[</span><span class="mi">256</span><span class="p">];</span>
+  <span class="kt">wchar_t</span> <span class="n">description</span><span class="p">[</span><span class="mi">1024</span><span class="p">];</span>
+  <span class="kt">int</span> <span class="n">usage</span><span class="p">;</span>
+  <span class="kt">int</span> <span class="n">field_A3C</span><span class="p">;</span>
+  <span class="n">__int64</span> <span class="n">field_A40</span><span class="p">;</span>
+  <span class="n">BYTE</span> <span class="n">gapA48</span><span class="p">[</span><span class="mi">16</span><span class="p">];</span>
+  <span class="kt">int</span> <span class="n">field_A58</span><span class="p">;</span>
+  <span class="kt">int</span> <span class="n">field_A5C</span><span class="p">;</span>
+  <span class="n">__int64</span> <span class="n">field_A60</span><span class="p">;</span>
+  <span class="kt">int</span> <span class="n">mediatype</span><span class="p">;</span>
+  <span class="kt">int</span> <span class="n">field_A6C</span><span class="p">;</span>
+  <span class="kt">int</span> <span class="n">faultDomainAwareness</span><span class="p">;</span>
+  <span class="kt">int</span> <span class="n">AllocationUnitSize</span><span class="p">;</span>
+  <span class="kt">int</span> <span class="n">field_A78</span><span class="p">;</span>
+  <span class="kt">int</span> <span class="n">numOfGuids</span><span class="p">;</span>
+  <span class="kt">int</span> <span class="n">offsetGuids</span><span class="p">;</span>
+  <span class="kt">int</span> <span class="n">field_A84</span><span class="p">;</span>
+  <span class="kt">int</span> <span class="n">physicalDiskRedundancy</span><span class="p">;</span>
+  <span class="kt">int</span> <span class="n">NumberOfDataCopies</span><span class="p">;</span>
+  <span class="kt">int</span> <span class="n">field_A90</span><span class="p">;</span>
+  <span class="kt">int</span> <span class="n">NumberOfColumns</span><span class="p">;</span>
+  <span class="kt">int</span> <span class="n">Interleave</span><span class="p">;</span>
+  <span class="kt">int</span> <span class="n">field_A9C</span><span class="p">;</span>
+  <span class="kt">int</span> <span class="n">field_AA0</span><span class="p">;</span>
+  <span class="kt">int</span> <span class="n">field_AA4</span><span class="p">;</span>
+  <span class="n">__int64</span> <span class="n">field_AA8</span><span class="p">;</span>
+  <span class="kt">char</span> <span class="n">additionalData</span><span class="p">[];</span>
+<span class="p">}</span><span class="n">POOLTIER</span><span class="p">,</span> <span class="o">*</span><span class="n">PPOOLTIER</span><span class="p">;</span>
+</pre></td></tr></tbody></table></code></pre></div>        </div>
+      </li>
+      <li>output: no particular output</li>
+    </ul>
+  </li>
+  <li>SpIoctlDeleteTier
+    <ul>
+      <li>purpose : to delete a tier</li>
+      <li>available from local administrators group and system</li>
+      <li>
+        <p>IOCTL code: 0xE7D414</p>
+
+        <ul>
+          <li>input: a structure containing the GUID of the pool whose tier is attached, and the GUID of the tier:</li>
+        </ul>
+
+        <div class="language-c highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><!-- <td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+</pre></td> --><td class="rouge-code"><pre><span class="k">typedef</span> <span class="k">struct</span>
+<span class="p">{</span>
+  <span class="n">GUID</span> <span class="n">poolGUID</span><span class="p">;</span>
+  <span class="n">GUID</span> <span class="n">tierGUID</span><span class="p">;</span>
+<span class="p">}</span> <span class="n">POOLDELETETIER</span><span class="p">,</span> <span class="o">*</span><span class="n">PPOOLDELETETIER</span><span class="p">;</span>
+</pre></td></tr></tbody></table></code></pre></div>        </div>
+      </li>
+      <li>output: no particular output</li>
+    </ul>
+  </li>
+  <li>SpIoctlGetTierInfo
+    <ul>
+      <li>purpose : get the information about a tier</li>
+      <li>no particular access checks</li>
+      <li>IOCTL code: 0xE71408</li>
+      <li>input: a structure like this one (which is the starts of a POOLTIER structure):</li>
+    </ul>
+
+    <div class="language-c highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><!-- <td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+</pre></td> --><td class="rouge-code"><pre>  <span class="k">typedef</span> <span class="k">struct</span>
+  <span class="p">{</span>
+    <span class="kt">int</span> <span class="n">unk</span><span class="p">;</span>
+    <span class="kt">int</span> <span class="n">length</span><span class="p">;</span>       <span class="c1">//should be set to 0x28</span>
+    <span class="n">GUID</span> <span class="n">PoolGUID</span><span class="p">;</span>
+    <span class="n">GUID</span> <span class="n">TierGUID</span><span class="p">;</span>
+  <span class="p">}</span>
+</pre></td></tr></tbody></table></code></pre></div>    </div>
+    <ul>
+      <li>output : a POOLTIER structure</li>
+    </ul>
+  </li>
+</ul>
+:ET
