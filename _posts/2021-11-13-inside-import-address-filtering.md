@@ -3,6 +3,7 @@ layout: post
 title:  Inside Import Address Filtering
 date:   2021-11-13 22:57:40 +0100
 img_path: /assets/img/2022-01-25-inside-import-address-filtering/
+description: An explanation about the Windows Import Address Filtering mitigation 
 ---
 
 ## Short Intro and past references
