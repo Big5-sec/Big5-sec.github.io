@@ -2,19 +2,23 @@
 <urlset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd" xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 <url>
 <loc>https://big5-sec.github.io/posts/inside-import-address-filtering/</loc>
-<lastmod>2022-02-08T01:18:35+01:00</lastmod>
+<lastmod>2022-05-24T22:59:39+02:00</lastmod>
 </url>
 <url>
 <loc>https://big5-sec.github.io/posts/an-analysis-of-cve-2022-21877/</loc>
-<lastmod>2022-02-10T21:32:32+01:00</lastmod>
+<lastmod>2022-05-24T22:59:39+02:00</lastmod>
+</url>
+<url>
+<loc>https://big5-sec.github.io/posts/component-filter-mitigation/</loc>
+<lastmod>2022-05-23T23:47:40+02:00</lastmod>
 </url>
 <url>
 <loc>https://big5-sec.github.io/about/</loc>
-<lastmod>2022-02-10T21:37:53+01:00</lastmod>
+<lastmod>2022-05-24T22:59:56+02:00</lastmod>
 </url>
 <url>
 <loc>https://big5-sec.github.io/archives/</loc>
-<lastmod>2022-02-10T21:37:53+01:00</lastmod>
+<lastmod>2022-05-24T22:59:56+02:00</lastmod>
 </url>
 <url>
 <loc>https://big5-sec.github.io/</loc>
