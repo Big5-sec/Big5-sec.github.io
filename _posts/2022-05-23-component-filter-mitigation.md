@@ -4,6 +4,7 @@ title: The new Component Filter mitigation
 date:   2022-05-23 22:47:40 +0100
 img_path: /assets/img/2022-05-23-component-filter-mitigation/
 description: a technical description of this new Windows mitigation
+category: blogpost
 ---
 
 ## Introduction

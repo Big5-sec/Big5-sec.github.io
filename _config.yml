@@ -62,43 +62,11 @@ google_analytics:
     proxy_endpoint:   # fill in the Google Analytics superProxy endpoint of Google App Engine
     cache_path:       # the local PV cache data, friendly to visitors from GFW region
 
-# Prefer color scheme setting.
-#
-# Note: Keep empty will follow the system prefer color by default,
-# and there will be a toggle to switch the theme between dark and light
-# on the bottom left of the sidebar.
-#
-# Available options:
-#
-#     light  - Use the light color scheme
-#     dark   - Use the dark color scheme
-#
 theme_mode: dark  # [light|dark]
-
-# The CDN endpoint for images.
-# Notice that once it is assigned, the CDN url
-# will be added to all image (site avatar & posts' images) paths starting with '/'
-#
-# e.g. 'https://cdn.com'
-# img_cdn: ''
-
-# the avatar on sidebar, support local or CORS resources
 avatar: '/assets/avatar.jpg'
 
 # boolean type, the global switch for ToC in posts.
 toc: true
-
-# comments:
-#   active:         # The global switch for posts comments, e.g., 'disqus'.  Keep it empty means disable
-#   # The active options are as follows:
-#   disqus:
-#     shortname:    # fill with the Disqus shortname. › https://help.disqus.com/en/articles/1717111-what-s-a-shortname
-#   # utterances settings › https://utteranc.es/
-#   utterances:
-#     repo:         # <gh-username>/<repo>
-#     issue_term:   # < url | pathname | title | ...>
-
-paginate: 10
 
 # ------------ The following options are not recommended to be modified ------------------
 
@@ -124,7 +92,7 @@ defaults:
       type: posts
     values:
       layout: post
-      comments: true    # Enable comments in posts.
+      comments: false    # Enable comments in posts.
       toc: true         # Display TOC column in posts.
       # DO NOT modify the following parameter unless you are confident enough
       # to update the code of all other post links in this project.

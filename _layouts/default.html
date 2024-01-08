@@ -17,10 +17,6 @@ layout: compress
 
   {% include head.html %}
 
-  {% unless site.theme_mode %}
-    {% include mode-toggle.html %}
-  {% endunless %}
-
   <body data-spy="scroll" data-target="#toc" data-topbar-visible="true">
 
     {% include sidebar.html %}
@@ -31,8 +27,6 @@ layout: compress
       <div id="main">
 
         {{ content }}
-
-        {% include footer.html %}
 
       </div>
 
