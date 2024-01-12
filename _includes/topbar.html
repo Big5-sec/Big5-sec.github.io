@@ -5,44 +5,17 @@
 <div id="topbar-wrapper" class="row justify-content-center">
   <div id="topbar" class="col-11 d-flex h-100 align-items-center justify-content-between">
     <span id="breadcrumb">
-
-    {% assign paths = page.url | split: '/' %}
-
-    {% if paths.size == 0 or page.layout == 'home' %}
-      <!-- index page -->
-      <span>{{ site.data.locales[lang].tabs.home | capitalize }}</span>
-
-    {% else %}
-
-      {% for item in paths %}
-
-        {% if forloop.first %}
-          <span>
-            <a href="{{ '/' | relative_url }}">
-              {{ site.data.locales[lang].tabs.home | capitalize }}
-            </a>
-          </span>
-
-        {% elsif forloop.last %}
-
-          {% if page.collection == 'tabs' %}
-            <span>{{ site.data.locales[lang].tabs[item] | default: page.title }}</span>
-          {% else %}
-            <span>{{ page.title }}</span>
-          {% endif %}
-
-        {% elsif page.layout == 'category' or page.layout == 'tag' %}
-          <span>
-            <a href="{{ item | relative_url }}">
-              {{ site.data.locales[lang].tabs[item] | default: page.title }}
-            </a>
-          </span>
+      {% if page.layout == 'post' %}
+        {% if page.category == 'advisory' %}
+          <span><a href="{{ '/advisories' | relative_url }}">Advisories</a></span>
+          <span>{{ page.title }}</span>
+        {% else %}
+        <span><a href="{{ '/blogposts' | relative_url }}">Blogposts</a></span>
+        <span>{{ page.title }}</span>
         {% endif %}
-
-      {% endfor %}
-
-    {% endif %}
-
+      {% else %}
+        <span>{{ site.data.locales[lang].tabs[item] | default: page.title }}</span>
+      {% endif %}
     </span><!-- endof #breadcrumb -->
 
     <i id="sidebar-trigger" class="fas fa-bars fa-fw"></i>
