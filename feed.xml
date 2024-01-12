@@ -1,1 +1,224 @@
-<feed xmlns="http://www.w3.org/2005/Atom"> <id>https://big5-sec.github.io/</id><title>yar-eb</title><subtitle>A personal blog about reverse, pwn and security</subtitle> <updated>2023-08-18T23:57:19+02:00</updated> <author> <name>Zilio Nicolas</name> <uri>https://big5-sec.github.io/</uri> </author><link rel="self" type="application/atom+xml" href="https://big5-sec.github.io/feed.xml"/><link rel="alternate" type="text/html" hreflang="en" href="https://big5-sec.github.io/"/> <generator uri="https://jekyllrb.com/" version="4.3.2">Jekyll</generator> <rights> © 2023 Zilio Nicolas </rights> <icon>/assets/img/favicons/favicon.ico</icon> <logo>/assets/img/favicons/favicon-96x96.png</logo> <entry><title>A look at CVE-2023-29360, a beautiful logical LPE vuln</title><link href="https://big5-sec.github.io/posts/CVE-2023-29360-analysis/" rel="alternate" type="text/html" title="A look at CVE-2023-29360, a beautiful logical LPE vuln" /><published>2023-08-18T23:50:40+02:00</published> <updated>2023-08-18T23:50:40+02:00</updated> <id>https://big5-sec.github.io/posts/CVE-2023-29360-analysis/</id> <content src="https://big5-sec.github.io/posts/CVE-2023-29360-analysis/" /> <author> <name>Zilio Nicolas</name> </author> <summary> Introduction When looking for vulnerabilities of interest, it’s always a good option to look for vulnerabilities used at pwn2own. Indeed, these vulnerabilities are exploited during the competition, meaning they indeed have a practical impact. This year, I got my interest piqued during my freetime by a LPE (CVE-2023-29360) reported by Thomas Imbert(@masthoon) for the following reasons: Thom... </summary> </entry> <entry><title>The new Component Filter mitigation</title><link href="https://big5-sec.github.io/posts/component-filter-mitigation/" rel="alternate" type="text/html" title="The new Component Filter mitigation" /><published>2022-05-23T23:47:40+02:00</published> <updated>2022-05-23T23:47:40+02:00</updated> <id>https://big5-sec.github.io/posts/component-filter-mitigation/</id> <content src="https://big5-sec.github.io/posts/component-filter-mitigation/" /> <author> <name>Zilio Nicolas</name> </author> <summary> Introduction Microsoft introduced recently a new mitigation in the Windows kernel, dubbed “Component Filter”. The following blog post will explains what this mitigation is about, and how it actually works. Let’s dive in. The big picture Before going into the details of this new mitigation, I thought it would be better to present my own view of the aims of this new mitigation, and how it inte... </summary> </entry> <entry><title>An analysis of CVE-2022-21877</title><link href="https://big5-sec.github.io/posts/an-analysis-of-cve-2022-21877/" rel="alternate" type="text/html" title="An analysis of CVE-2022-21877" /><published>2022-02-07T22:57:40+01:00</published> <updated>2022-05-24T22:59:39+02:00</updated> <id>https://big5-sec.github.io/posts/an-analysis-of-cve-2022-21877/</id> <content src="https://big5-sec.github.io/posts/an-analysis-of-cve-2022-21877/" /> <author> <name>Zilio Nicolas</name> </author> <summary> Introduction I wanted to have some fun on patch diffing : on the latest “patch tuesday” update, Microsoft released a patch for an information disclosure vulnerability in the storage spaces controller. This vulnerability has been found by Quang Linh, working at STAR Labs. Because leaking information is often easier than a full blown RCE/LPE exploit, I selected this vuln because it would take l... </summary> </entry> <entry><title>Inside Import Address Filtering</title><link href="https://big5-sec.github.io/posts/inside-import-address-filtering/" rel="alternate" type="text/html" title="Inside Import Address Filtering" /><published>2021-11-13T22:57:40+01:00</published> <updated>2022-05-24T22:59:39+02:00</updated> <id>https://big5-sec.github.io/posts/inside-import-address-filtering/</id> <content src="https://big5-sec.github.io/posts/inside-import-address-filtering/" /> <author> <name>Zilio Nicolas</name> </author> <summary> Short Intro and past references For a course I teach, I wanted to present the modern mitigations one can encounter on Windows. I focused on those aimed at preventing shellcode execution and ROP, because this course was on stack buffer overflows. Namely, the interesting ones are: Stackpivot CallerCheck SimExec Import Address Filtering (IAF) Export Address Filtering (EAF) One of my... </summary> </entry> </feed>
+
+
+<feed xmlns="http://www.w3.org/2005/Atom">
+  <id>https://big5-sec.github.io/</id>
+  <title>yar-eb</title>
+  <subtitle>A personal blog about reverse, pwn and security</subtitle>
+  <updated>2024-01-12T11:33:08+01:00</updated>
+  <author>
+    <name>Zilio Nicolas</name>
+    <uri>https://big5-sec.github.io/</uri>
+  </author>
+  <link rel="self" type="application/atom+xml" href="https://big5-sec.github.io/feed.xml"/>
+  <link rel="alternate" type="text/html" hreflang="en"
+    href="https://big5-sec.github.io/"/>
+  <generator uri="https://jekyllrb.com/" version="4.3.3">Jekyll</generator>
+  <rights> © 2024 Zilio Nicolas </rights>
+  <icon>/assets/img/favicons/favicon.ico</icon>
+  <logo>/assets/img/favicons/favicon-96x96.png</logo>
+
+
+  
+  <entry>
+    <title>CVE-2023-5350 - SuiteCRM < v7.14.0 authenticated SQL injection</title>
+    <link href="https://big5-sec.github.io/posts/cve-2023-5350-SuiteCRM-SQLi/" rel="alternate" type="text/html" title="CVE-2023-5350 - SuiteCRM < v7.14.0 authenticated SQL injection" />
+    <published>2024-01-11T02:50:40+01:00</published>
+  
+    <updated>2024-01-11T02:50:40+01:00</updated>
+  
+    <id>https://big5-sec.github.io/posts/cve-2023-5350-SuiteCRM-SQLi/</id>
+    <content src="https://big5-sec.github.io/posts/cve-2023-5350-SuiteCRM-SQLi/" />
+    <author>
+      <name>Zilio Nicolas</name>
+    </author>
+
+  
+    
+    <category term="advisory" />
+    
+  
+
+  
+    <summary>
+      
+
+
+
+
+
+      TL:DR
+
+Authenticated SQL injection affecting the Opportunities module of SuiteCRM for versions prior to 7.14.0
+
+Details
+
+At CrowdStrike, following claims from a threat actor to have hacked SuiteCRM at multiple entities using a SQL injection, I started a little audit of SuiteCRM to uncover whether the threat was realistic or not. Upon research, I stumbled on the modules/Opportunities/Save.php fi...
+    </summary>
+  
+
+  </entry>
+
+  
+  <entry>
+    <title>A look at CVE-2023-29360, a beautiful logical LPE vuln</title>
+    <link href="https://big5-sec.github.io/posts/CVE-2023-29360-analysis/" rel="alternate" type="text/html" title="A look at CVE-2023-29360, a beautiful logical LPE vuln" />
+    <published>2023-08-18T22:50:40+01:00</published>
+  
+    <updated>2024-01-08T15:22:10+01:00</updated>
+  
+    <id>https://big5-sec.github.io/posts/CVE-2023-29360-analysis/</id>
+    <content src="https://big5-sec.github.io/posts/CVE-2023-29360-analysis/" />
+    <author>
+      <name>Zilio Nicolas</name>
+    </author>
+
+  
+    
+    <category term="blogpost" />
+    
+  
+
+  
+    <summary>
+      
+
+
+
+
+
+      Introduction
+
+When looking for vulnerabilities of interest, it’s always a good option to look for vulnerabilities used at pwn2own. Indeed, these vulnerabilities are exploited during the competition, meaning they indeed have a practical impact. This year, I got my interest piqued during my freetime by a LPE (CVE-2023-29360) reported by Thomas Imbert(@masthoon) for the following reasons:
+
+
+  Thom...
+    </summary>
+  
+
+  </entry>
+
+  
+  <entry>
+    <title>The new Component Filter mitigation</title>
+    <link href="https://big5-sec.github.io/posts/component-filter-mitigation/" rel="alternate" type="text/html" title="The new Component Filter mitigation" />
+    <published>2022-05-23T22:47:40+01:00</published>
+  
+    <updated>2024-01-08T15:22:10+01:00</updated>
+  
+    <id>https://big5-sec.github.io/posts/component-filter-mitigation/</id>
+    <content src="https://big5-sec.github.io/posts/component-filter-mitigation/" />
+    <author>
+      <name>Zilio Nicolas</name>
+    </author>
+
+  
+    
+    <category term="blogpost" />
+    
+  
+
+  
+    <summary>
+      
+
+
+
+
+
+      Introduction
+
+Microsoft introduced recently a new mitigation in the Windows kernel, dubbed “Component Filter”. The following blog post will explains what this mitigation is about, and how it actually works. Let’s dive in.
+
+The big picture
+
+Before going into the details of this new mitigation, I thought it would be better to present my own view of the aims of this new mitigation, and how it inte...
+    </summary>
+  
+
+  </entry>
+
+  
+  <entry>
+    <title>An analysis of CVE-2022-21877</title>
+    <link href="https://big5-sec.github.io/posts/an-analysis-of-cve-2022-21877/" rel="alternate" type="text/html" title="An analysis of CVE-2022-21877" />
+    <published>2022-02-07T22:57:40+01:00</published>
+  
+    <updated>2024-01-08T15:22:10+01:00</updated>
+  
+    <id>https://big5-sec.github.io/posts/an-analysis-of-cve-2022-21877/</id>
+    <content src="https://big5-sec.github.io/posts/an-analysis-of-cve-2022-21877/" />
+    <author>
+      <name>Zilio Nicolas</name>
+    </author>
+
+  
+    
+    <category term="blogpost" />
+    
+  
+
+  
+    <summary>
+      
+
+
+
+
+
+      Introduction
+
+I wanted to have some fun on patch diffing : on the latest “patch tuesday” update, Microsoft released a patch for an information disclosure vulnerability in the storage spaces controller. This vulnerability has been found by Quang Linh, working at STAR Labs.  Because leaking information is often easier than a full blown RCE/LPE exploit, I selected this vuln because it would take l...
+    </summary>
+  
+
+  </entry>
+
+  
+  <entry>
+    <title>Inside Import Address Filtering</title>
+    <link href="https://big5-sec.github.io/posts/inside-import-address-filtering/" rel="alternate" type="text/html" title="Inside Import Address Filtering" />
+    <published>2021-11-13T22:57:40+01:00</published>
+  
+    <updated>2024-01-08T15:22:10+01:00</updated>
+  
+    <id>https://big5-sec.github.io/posts/inside-import-address-filtering/</id>
+    <content src="https://big5-sec.github.io/posts/inside-import-address-filtering/" />
+    <author>
+      <name>Zilio Nicolas</name>
+    </author>
+
+  
+    
+    <category term="blogpost" />
+    
+  
+
+  
+    <summary>
+      
+
+
+
+
+
+      Short Intro and past references
+
+For a course I teach, I wanted to present the modern mitigations one can encounter on Windows. I focused on those aimed at preventing shellcode execution and ROP, because this course was on stack buffer overflows. Namely, the interesting ones are:
+
+
+  Stackpivot
+  CallerCheck
+  SimExec
+  Import Address Filtering (IAF)
+  Export Address Filtering (EAF)
+
+
+One of my...
+    </summary>
+  
+
+  </entry>
+
+</feed>
+
+
