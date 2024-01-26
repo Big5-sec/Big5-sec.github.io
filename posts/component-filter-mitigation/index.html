@@ -1,16 +1,673 @@
-<!DOCTYPE html><html lang="en" data-mode="dark" ><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"><meta name="generator" content="Jekyll v4.3.2" /><meta property="og:title" content="The new Component Filter mitigation" /><meta property="og:locale" content="en" /><meta name="description" content="a technical description of this new Windows mitigation" /><meta property="og:description" content="a technical description of this new Windows mitigation" /><link rel="canonical" href="https://big5-sec.github.io/posts/component-filter-mitigation/" /><meta property="og:url" content="https://big5-sec.github.io/posts/component-filter-mitigation/" /><meta property="og:site_name" content="yar-eb" /><meta property="og:type" content="article" /><meta property="article:published_time" content="2022-05-23T23:47:40+02:00" /><meta name="twitter:card" content="summary" /><meta property="twitter:title" content="The new Component Filter mitigation" /> <script type="application/ld+json"> {"@context":"https://schema.org","@type":"BlogPosting","dateModified":"2022-05-23T23:47:40+02:00","datePublished":"2022-05-23T23:47:40+02:00","description":"a technical description of this new Windows mitigation","headline":"The new Component Filter mitigation","mainEntityOfPage":{"@type":"WebPage","@id":"https://big5-sec.github.io/posts/component-filter-mitigation/"},"url":"https://big5-sec.github.io/posts/component-filter-mitigation/"}</script><title>The new Component Filter mitigation | yar-eb</title><link rel="apple-touch-icon" sizes="180x180" href="/assets/img/favicons/apple-touch-icon.png"><link rel="icon" type="image/png" sizes="32x32" href="/assets/img/favicons/favicon-32x32.png"><link rel="icon" type="image/png" sizes="16x16" href="/assets/img/favicons/favicon-16x16.png"><link rel="manifest" href="/assets/img/favicons/site.webmanifest"><link rel="shortcut icon" href="/assets/img/favicons/favicon.ico"><meta name="apple-mobile-web-app-title" content="yar-eb"><meta name="application-name" content="yar-eb"><meta name="msapplication-TileColor" content="#da532c"><meta name="msapplication-config" content="/assets/img/favicons/browserconfig.xml"><meta name="theme-color" content="#ffffff"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous"><link rel="dns-prefetch" href="https://fonts.gstatic.com"><link rel="preconnect" href="https://cdn.jsdelivr.net"><link rel="dns-prefetch" href="https://cdn.jsdelivr.net"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.11.2/css/all.min.css"><link rel="stylesheet" href="/assets/css/style.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/afeld/bootstrap-toc@1.0.1/dist/bootstrap-toc.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/magnific-popup@1.1.0/dist/magnific-popup.min.css"> <script src="https://cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script><body data-spy="scroll" data-target="#toc" data-topbar-visible="true"><div id="sidebar" class="d-flex flex-column align-items-end"><div class="profile-wrapper text-center"><div id="avatar"> <a href="/" alt="avatar" class="mx-auto"> <img src=" /assets/avatar.jpg " alt="avatar" onerror="this.style.display='none'"> </a></div><div class="site-title mt-3"> <a href="/">yar-eb</a></div><div class="site-subtitle font-italic">Yet another reverse-engineer blog</div></div><ul class="w-100"><li class="nav-item"> <a href="/" class="nav-link"> <i class="fa-fw fas fa-home ml-xl-3 mr-xl-3 unloaded"></i> <span>HOME</span> </a><li class="nav-item"> <a href="/about/" class="nav-link"> <i class="fa-fw fas fa-info-circle ml-xl-3 mr-xl-3 unloaded"></i> <span>ABOUT</span> </a><li class="nav-item"> <a href="/archives/" class="nav-link"> <i class="fa-fw fas fa-archive ml-xl-3 mr-xl-3 unloaded"></i> <span>ARCHIVES</span> </a></ul><div class="sidebar-bottom mt-auto d-flex flex-wrap justify-content-center align-items-center"> <a href="https://github.com/Big5-sec" aria-label="github" target="_blank" rel="noopener" > <i class="fab fa-github"></i> </a> <a href="/feed.xml" aria-label="rss" > <i class="fas fa-rss"></i> </a></div></div><div id="topbar-wrapper" class="row justify-content-center"><div id="topbar" class="col-11 d-flex h-100 align-items-center justify-content-between"> <span id="breadcrumb"> <span> <a href="/"> Home </a> </span> <span>The new Component Filter mitigation</span> </span> <i id="sidebar-trigger" class="fas fa-bars fa-fw"></i><div id="topbar-title"> Post</div><i id="search-trigger" class="fas fa-search fa-fw"></i> <span id="search-wrapper" class="align-items-center"> <i class="fas fa-search fa-fw"></i> <input class="form-control" id="search-input" type="search" aria-label="search" autocomplete="off" placeholder="Search..."> <i class="fa fa-times-circle fa-fw" id="search-cleaner"></i> </span> <span id="search-cancel" >Cancel</span></div></div><div id="main-wrapper"><div id="main"><div class="row"><div id="core-wrapper" class="col-12 col-lg-11 col-xl-8"><div class="post pl-1 pr-1 pl-sm-2 pr-sm-2 pl-md-4 pr-md-4"><h1 data-toc-skip>The new Component Filter mitigation</h1><div class="post-meta text-muted"><div class="d-flex"><div> <span> Posted <em class="timeago" data-ts="1653342460" data-toggle="tooltip" data-placement="bottom" data-tooltip-df="llll" > 2022-05-23 </em> </span> <span class="readtime" data-toggle="tooltip" data-placement="bottom" title="1469 words"> <em>8 min</em> read</span></div></div></div><div class="post-content"><h2 id="introduction">Introduction <a href="#introduction" class="anchor"><i class="fas fa-hashtag"></i></a></h2></h2><p>Microsoft introduced recently a new mitigation in the Windows kernel, dubbed “Component Filter”. The following blog post will explains what this mitigation is about, and how it actually works. Let’s dive in.</p><h2 id="the-big-picture">The big picture <a href="#the-big-picture" class="anchor"><i class="fas fa-hashtag"></i></a></h2></h2><p>Before going into the details of this new mitigation, I thought it would be better to present my own view of the aims of this new mitigation, and how it integrates with the current state of Windows’s kernel security policy. Hopefully, this is accurate enough, even if I’ll make some simplifications. People who just want technical details could go to the next paragraph.</p><p>This new mitigation is a new syscall disabling mechanism, but only for “components” of the windows kernel. Let’s see what that means:</p><p>Historically, Windows promoted a programming paradigm for userland programs based on APIs, and not on syscalls. What this means is that Microsoft considered that syscalls are not something a standard userland program should do directly, and instead, those programs should use the programmatic Windows API. It implies that syscalls can be changed between multiple Windows releases (it’s still the case), and that Microsoft is entirely in control of this mechanism. It also implies that the Windows API is fixed, otherwise all the code relying on it has to change between Windows releases. That’s why we are seeing differently numbered APIs when changes are introduced (have a look for example at <code class="language-plaintext highlighter-rouge">GetTempPathA</code> and <code class="language-plaintext highlighter-rouge">GetTempPath2A</code>). On the contrary, Linux has a programming paradigm based on syscalls. This means syscalls are fixed, but the API is not. This explains the existence of the <code class="language-plaintext highlighter-rouge">dup2</code> syscall to replace the <code class="language-plaintext highlighter-rouge">dup</code> one.</p><p>This programming paradigm explains partly why Microsoft has not implemented any correct syscall filtering mechanism : those are not fixed! So, to provide some protection against malicious syscalls, Microsoft decided to implement a mechanism based on the disablement of syscalls given their underlying treating component. But what’s a treating component? It’s the module responsible to handle a given syscall in kernel land.</p><p>For example, one could see Windows syscalls as divided in 4 big categories:</p><ul><li>the graphic syscalls, handled by the win32k.sys component<li>the device syscalls (in fact IRPs passed through DeviceIoControl), handled by the corresponding device driver components<li>the direct NT syscalls, directly handled by the kernel<li>the indirect NT syscalls, which are dispatched by the kernel to some underlying components. Examples of such underlying components are the ones handling file systems operations : depending on the file system you use, you load the corresponding component. When you want to write a file, you use the same syscall whatever is the underlying file system; it is then dispatched to the correct component able to translate it to an appropriate operation for the file system.</ul><p>Here is a little schema resuming that:</p><p><img data-src="/assets/img/2022-05-23-component-filter-mitigation/syscalls_schema.PNG" alt="schema" data-proofer-ignore></p><p>Microsoft first provided the win32k lockdown mechanism. Without going into details, based on a flag defined in the <code class="language-plaintext highlighter-rouge">EPROCESS</code> structure, a win32k syscall is not handled by the same function.</p><p>This new component filter mitigation follows the same principle, but with more details : it will prevent transaction manager related syscalls that are dispatched towards the kernel transaction manager(KTM) component.</p><h2 id="how-it-works-internally">How it works internally <a href="#how-it-works-internally" class="anchor"><i class="fas fa-hashtag"></i></a></h2></h2><p>For this new mitigation to be operational, Microsoft implemented a new <code class="language-plaintext highlighter-rouge">DisabledComponentFlags</code> field in the <code class="language-plaintext highlighter-rouge">EPROCESS</code> structure. This field is an unsigned long and gets filled by the <code class="language-plaintext highlighter-rouge">PspApplyComponentFilterOptions</code> function. This function is called by the internal function <code class="language-plaintext highlighter-rouge">PspAllocateProcess</code>, and as such this new field can only get set when a process is spawned. The only way I found to define this field is through the usage of the <em>STARTUPINFO</em> attributes, through the <code class="language-plaintext highlighter-rouge">UpdateProcThreadAttribute</code> function.</p><p>This <code class="language-plaintext highlighter-rouge">DisabledComponentFlags</code> gets checked by a new introduced function dubbed <code class="language-plaintext highlighter-rouge">PsIsComponentEnabled</code> in <code class="language-plaintext highlighter-rouge">ntoskrnl</code>. Here is its code:</p><div class="language-c highlighter-rouge"><div class="code-header"> <span data-label-text="C"><i class="fas fa-code small"></i></span> <button aria-label="copy" data-title-succeed="Copied!"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+<!DOCTYPE html>
+
+
+
+
+
+
+
+<html lang="en"
+  
+    data-mode="dark"
+  
+>
+
+  <!--
+  The Head
+-->
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+  <!-- Allow having a localized datetime different from the appearance language -->
+  
+
+  
+
+    
+
+    
+
+  
+
+  <!-- Begin Jekyll SEO tag v2.8.0 -->
+<meta name="generator" content="Jekyll v4.3.3" />
+<meta property="og:title" content="The new Component Filter mitigation" />
+<meta property="og:locale" content="en" />
+<meta name="description" content="a technical description of this new Windows mitigation" />
+<meta property="og:description" content="a technical description of this new Windows mitigation" />
+<link rel="canonical" href="https://big5-sec.github.io/posts/component-filter-mitigation/" />
+<meta property="og:url" content="https://big5-sec.github.io/posts/component-filter-mitigation/" />
+<meta property="og:site_name" content="yar-eb" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2022-05-23T22:47:40+01:00" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="The new Component Filter mitigation" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BlogPosting","dateModified":"2024-01-26T21:50:48+01:00","datePublished":"2022-05-23T22:47:40+01:00","description":"a technical description of this new Windows mitigation","headline":"The new Component Filter mitigation","mainEntityOfPage":{"@type":"WebPage","@id":"https://big5-sec.github.io/posts/component-filter-mitigation/"},"url":"https://big5-sec.github.io/posts/component-filter-mitigation/"}</script>
+<!-- End Jekyll SEO tag -->
+
+
+  <title>The new Component Filter mitigation | yar-eb
+  </title>
+
+  <!--
+  The Favicons for Web, Android, Microsoft, and iOS (iPhone and iPad) Apps
+  Generated by: https://realfavicongenerator.net/
+-->
+
+
+
+<link rel="apple-touch-icon" sizes="180x180" href="/assets/img/favicons/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/assets/img/favicons/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/assets/img/favicons/favicon-16x16.png">
+<link rel="manifest" href="/assets/img/favicons/site.webmanifest">
+<link rel="shortcut icon" href="/assets/img/favicons/favicon.ico">
+<meta name="apple-mobile-web-app-title" content="yar-eb">
+<meta name="application-name" content="yar-eb">
+<meta name="msapplication-TileColor" content="#da532c">
+<meta name="msapplication-config" content="/assets/img/favicons/browserconfig.xml">
+<meta name="theme-color" content="#ffffff">
+
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous">
+  <link rel="dns-prefetch" href="https://fonts.gstatic.com">
+
+  <!-- GA -->
+  
+
+  <!-- jsDelivr CDN -->
+  <link rel="preconnect" href="https://cdn.jsdelivr.net">
+  <link rel="dns-prefetch" href="https://cdn.jsdelivr.net">
+
+  <!-- Bootstrap -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css">
+
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.11.2/css/all.min.css">
+
+  <!--
+  CSS selector for site.
+-->
+
+<link rel="stylesheet" href="/assets/css/style.css">
+
+
+  <link rel="stylesheet"
+    href="https://cdn.jsdelivr.net/gh/afeld/bootstrap-toc@1.0.1/dist/bootstrap-toc.min.css">
+
+
+
+  <!-- Manific Popup -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/magnific-popup@1.1.0/dist/magnific-popup.min.css">
+
+
+
+  <!-- JavaScript -->
+
+  <script src="https://cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+
+</head>
+
+
+  <body data-spy="scroll" data-target="#toc" data-topbar-visible="true">
+
+    <!--
+  The Side Bar
+-->
+
+<div id="sidebar" class="d-flex flex-column align-items-end">
+  <div class="profile-wrapper text-center">
+    <div id="avatar">
+      <a href="/" alt="avatar" class="mx-auto">
+        
+        
+        <img src="
+        
+        /assets/avatar.jpg
+        
+        " alt="avatar" onerror="this.style.display='none'">
+        
+      </a>
+    </div>
+
+    <div class="site-title mt-3">
+      <a href="/">yar-eb</a>
+    </div>
+    <div class="site-subtitle font-italic">Yet another reverse-engineer blog</div>
+
+  </div><!-- .profile-wrapper -->
+
+  <ul class="w-100">
+
+    <!-- home -->
+    <li class="nav-item">
+      <a href="/" class="nav-link">
+        <i class="fa-fw fas fa-home ml-xl-3 mr-xl-3 unloaded"></i>
+        <span>HOME</span>
+      </a>
+    </li>
+
+    <!-- the real tabs -->
+    
+    <li class="nav-item">
+      <a href="/blogposts/" class="nav-link">
+        <i class="fa-fw fas fa-book ml-xl-3 mr-xl-3 unloaded"></i>
+        
+
+        <span>BLOGPOSTS</span>
+      </a>
+    </li> <!-- .nav-item -->
+    
+    <li class="nav-item">
+      <a href="/advisories/" class="nav-link">
+        <i class="fa-fw fas fa-bug ml-xl-3 mr-xl-3 unloaded"></i>
+        
+
+        <span>ADVISORIES</span>
+      </a>
+    </li> <!-- .nav-item -->
+    
+
+
+  </ul> <!-- ul.nav.flex-column -->
+
+  <div class="sidebar-bottom mt-auto d-flex flex-wrap justify-content-center align-items-center">
+    
+    
+
+    
+    <a href="https://github.com/Big5-sec" aria-label="github" target="_blank" rel="noopener" >
+      <i class="fab fa-github"></i>
+    </a>
+    
+
+    
+    
+
+    
+    <a href="/feed.xml" aria-label="rss" >
+      <i class="fas fa-rss"></i>
+    </a>
+    
+
+    
+
+  </div> <!-- .sidebar-bottom -->
+
+</div><!-- #sidebar -->
+
+    <!--
+  The Top Bar
+-->
+
+<div id="topbar-wrapper" class="row justify-content-center">
+  <div id="topbar" class="col-11 d-flex h-100 align-items-center justify-content-between">
+    <span id="breadcrumb">
+      
+        
+        <span><a href="/blogposts">Blogposts</a></span>
+        <span>The new Component Filter mitigation</span>
+        
+      
+    </span><!-- endof #breadcrumb -->
+
+    <i id="sidebar-trigger" class="fas fa-bars fa-fw"></i>
+
+    <div id="topbar-title">
+      Post
+    </div>
+
+    <i id="search-trigger" class="fas fa-search fa-fw"></i>
+    <span id="search-wrapper" class="align-items-center">
+      <i class="fas fa-search fa-fw"></i>
+      <input class="form-control" id="search-input" type="search"
+        aria-label="search" autocomplete="off" placeholder="Search...">
+      <i class="fa fa-times-circle fa-fw" id="search-cleaner"></i>
+    </span>
+    <span id="search-cancel" >Cancel</span>
+  </div>
+
+</div>
+
+
+    <div id="main-wrapper">
+      <div id="main">
+
+        
+
+
+
+<div class="row">
+
+  <!-- core -->
+  <div id="core-wrapper" class="col-12 col-lg-11 col-xl-8">
+    <div class="post pl-1 pr-1 pl-sm-2 pr-sm-2 pl-md-4 pr-md-4">
+
+    
+
+    
+      
+      
+        <!--
+  Refactor the HTML structure.
+-->
+
+
+
+<!--
+  In order to allow a wide table to scroll horizontally,
+  we suround the markdown table with `<div class="table-wrapper">` and `</div>`
+-->
+
+
+
+<!--
+  Fixed kramdown code highlight rendering:
+  https://github.com/penibelst/jekyll-compress-html/issues/101
+  https://github.com/penibelst/jekyll-compress-html/issues/71#issuecomment-188144901
+-->
+
+
+
+<!-- Add attribute 'hide-bullet' to the checkbox list -->
+
+
+
+<!-- images -->
+
+
+
+
+  
+  
+
+  
+    
+      
+      
+    
+
+    
+    
+    
+
+    
+    
+
+    
+    
+    
+
+    
+      
+      
+
+      
+      
+
+      
+
+      
+    
+      
+      
+
+      
+      
+
+      
+
+      
+    
+
+    
+      
+
+        <!-- Add CDN URL -->
+        
+
+        <!-- Add image path -->
+        
+
+        
+        
+
+      
+
+      <!-- lazy-load images <https://github.com/ApoorvSaxena/lozad.js#usage> -->
+
+      
+
+    
+
+    <!-- Add SVG placehoder to prevent layout reflow -->
+
+    
+
+    <!-- Bypass the HTML-proofer test -->
+    
+
+    
+
+  
+
+  
+
+
+
+<!-- Add header for code snippets -->
+
+
+
+<!-- Create heading anchors -->
+
+
+
+
+
+  
+  
+
+  
+    
+    
+
+    
+      
+        
+        
+      
+
+      
+      
+
+      
+      
+      
+      
+
+      
+
+    
+      
+
+      
+      
+
+      
+      
+      
+      
+
+      
+
+    
+      
+
+      
+      
+
+      
+      
+      
+      
+
+      
+
+    
+      
+
+      
+      
+
+      
+      
+      
+      
+
+      
+
+    
+      
+
+      
+      
+
+      
+      
+      
+      
+
+      
+
+    
+      
+
+      
+      
+
+      
+      
+      
+      
+
+      
+
+    
+
+    
+
+  
+
+  
+  
+
+  
+
+  
+  
+
+  
+
+  
+  
+
+  
+
+
+
+
+<!-- Wrap prompt element of blockquote with the <div> tag -->
+
+
+
+
+
+
+
+<!-- return -->
+
+
+
+
+
+
+
+<h1 data-toc-skip>The new Component Filter mitigation</h1>
+
+<div class="post-meta text-muted">
+
+  <!-- author -->
+  <!-- <div>
+    
+    
+
+    
+
+    By
+    <em>
+      
+        <a href="https://github.com/Big5-sec">Zilio Nicolas</a>
+      
+    </em>
+  </div> -->
+
+  <div class="d-flex">
+    <div>
+      <!-- published date -->
+      <span>
+        Posted
+        <!--
+  Date format snippet
+  See: ${JS_ROOT}/utils/timeago.js
+-->
+
+<em class="timeago"
+    data-ts="1653342460"
+    
+      data-toggle="tooltip" data-placement="bottom" data-tooltip-df="llll"
+    
+    >
+  2022-05-23
+</em>
+
+      </span>
+
+      <!-- lastmod date -->
+      
+      <span>
+        Updated
+        <!--
+  Date format snippet
+  See: ${JS_ROOT}/utils/timeago.js
+-->
+
+<em class="timeago"
+    data-ts="1706302248"
+    
+      data-toggle="tooltip" data-placement="bottom" data-tooltip-df="llll"
+    
+    >
+  2024-01-26
+</em>
+
+      </span>
+      
+
+      <!-- read time -->
+      <!--
+  Calculate the post's reading time, and display the word count in tooltip
+ -->
+
+
+
+<!-- words per minute  -->
+
+
+
+
+
+
+
+
+
+
+<!-- return element -->
+<span class="readtime" data-toggle="tooltip" data-placement="bottom"
+  title="1469 words">
+  <em>8 min</em> read</span>
+
+
+      <!-- page views -->
+      <!--  -->
+    </div>
+
+  </div> <!-- .d-flex -->
+
+</div> <!-- .post-meta -->
+
+<div class="post-content">
+  <h2 id="introduction">Introduction <a href="#introduction" class="anchor"><i class="fas fa-hashtag"></i></a></h2></h2>
+
+<p>Microsoft introduced recently a new mitigation in the Windows kernel, dubbed “Component Filter”. The following blog post will explains what this mitigation is about, and how it actually works. Let’s dive in.</p>
+
+<h2 id="the-big-picture">The big picture <a href="#the-big-picture" class="anchor"><i class="fas fa-hashtag"></i></a></h2></h2>
+
+<p>Before going into the details of this new mitigation, I thought it would be better to present my own view of the aims of this new mitigation, and how it integrates with the current state of Windows’s kernel security policy. Hopefully, this is accurate enough, even if I’ll make some simplifications.  People who just want technical details could go to the next paragraph.</p>
+
+<p>This new mitigation is a new syscall disabling mechanism, but only for “components” of the windows kernel. Let’s see what that means:</p>
+
+<p>Historically, Windows promoted a programming paradigm for userland programs based on APIs, and not on syscalls. What this means is that Microsoft considered that syscalls are not something a standard userland program should do directly, and instead, those programs should use the programmatic Windows API. It implies that syscalls can be changed between multiple Windows releases (it’s still the case), and that Microsoft is entirely in control of this mechanism. It also implies that the Windows API is fixed, otherwise all the code relying on it has to change between Windows releases. That’s why we are seeing differently numbered APIs when changes are introduced (have a look for example at <code class="language-plaintext highlighter-rouge">GetTempPathA</code> and <code class="language-plaintext highlighter-rouge">GetTempPath2A</code>). On the contrary, Linux has a programming paradigm based on syscalls. This means syscalls are fixed, but the API is not. This explains the existence of the <code class="language-plaintext highlighter-rouge">dup2</code> syscall to replace the <code class="language-plaintext highlighter-rouge">dup</code> one.</p>
+
+<p>This programming paradigm explains partly why Microsoft has not implemented any correct syscall filtering mechanism : those are not fixed! So, to provide some protection against malicious syscalls, Microsoft decided to implement a mechanism based on the disablement of syscalls given their underlying treating component. But what’s a treating component? It’s the module responsible to handle a given syscall in kernel land.</p>
+
+<p>For example, one could see Windows syscalls as divided in 4 big categories:</p>
+
+<ul>
+  <li>the graphic syscalls, handled by the win32k.sys component</li>
+  <li>the device syscalls (in fact IRPs passed through DeviceIoControl), handled by the corresponding device driver components</li>
+  <li>the direct NT syscalls, directly handled by the kernel</li>
+  <li>the indirect NT syscalls, which are dispatched by the kernel to some underlying components. Examples of such underlying components are the ones handling file systems operations : depending on the file system you use, you load the corresponding component. When you want to write a file, you use the same syscall whatever is the underlying file system; it is then dispatched to the correct component able to translate it to an appropriate operation for the file system.</li>
+</ul>
+
+<p>Here is a little schema resuming that:</p>
+
+<p><img data-src="/assets/img/2022-05-23-component-filter-mitigation/syscalls_schema.PNG" alt="schema" data-proofer-ignore></p>
+
+<p>Microsoft first provided the win32k lockdown mechanism. Without going into details, based on a flag defined in the <code class="language-plaintext highlighter-rouge">EPROCESS</code> structure, a win32k syscall is not handled by the same function.</p>
+
+<p>This new component filter mitigation follows the same principle, but with more details : it will prevent transaction manager related syscalls that are dispatched towards the kernel transaction manager(KTM) component.</p>
+
+<h2 id="how-it-works-internally">How it works internally <a href="#how-it-works-internally" class="anchor"><i class="fas fa-hashtag"></i></a></h2></h2>
+
+<p>For this new mitigation to be operational, Microsoft implemented a new <code class="language-plaintext highlighter-rouge">DisabledComponentFlags</code> field in the <code class="language-plaintext highlighter-rouge">EPROCESS</code> structure. This field is an unsigned long and gets filled by the <code class="language-plaintext highlighter-rouge">PspApplyComponentFilterOptions</code> function. This function is called by the internal function <code class="language-plaintext highlighter-rouge">PspAllocateProcess</code>, and as such this new field can only get set when a process is spawned. The only way I found to define this field is through the usage of the <em>STARTUPINFO</em> attributes, through the <code class="language-plaintext highlighter-rouge">UpdateProcThreadAttribute</code> function.</p>
+
+<p>This <code class="language-plaintext highlighter-rouge">DisabledComponentFlags</code> gets checked by a new introduced function dubbed <code class="language-plaintext highlighter-rouge">PsIsComponentEnabled</code> in <code class="language-plaintext highlighter-rouge">ntoskrnl</code>. Here is its code:</p>
+
+<div class="language-c highlighter-rouge"><div class="code-header">
+        <span data-label-text="C"><i class="fas fa-code small"></i></span>
+      <button aria-label="copy" data-title-succeed="Copied!"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
 2
 3
 4
-</pre><td class="rouge-code"><pre><span class="n">BOOL</span> <span class="nf">PsIsComponentEnabled</span><span class="p">(</span><span class="n">ULONG</span> <span class="n">value</span><span class="p">)</span>
+</pre></td><td class="rouge-code"><pre><span class="n">BOOL</span> <span class="nf">PsIsComponentEnabled</span><span class="p">(</span><span class="n">ULONG</span> <span class="n">value</span><span class="p">)</span>
 <span class="p">{</span>
   <span class="k">return</span> <span class="p">(</span><span class="n">PsGetCurrentProcess</span><span class="p">()</span><span class="o">-&gt;</span><span class="n">DisabledComponentFlags</span> <span class="o">==</span> <span class="n">value</span><span class="p">);</span>
 <span class="p">}</span>
-</pre></table></code></div></div><p>The only component using this function is the <code class="language-plaintext highlighter-rouge">tm.sys</code> driver, which is the implementation of KTM. Inside this driver, the following functions are now using this <code class="language-plaintext highlighter-rouge">PsIsComponentEnabled</code> function :</p><ul><li>NtCreateTransactionManagerExt<li>NtOpenTransactionManagerExt<li>NtQueryInformationTransactionManagerExt<li>NtRecoverTransactionManagerExt<li>NtRenameTransactionManagerExt<li>NtRollforwardTransactionManagerExt<li>NtSetinformationTransactionManagerExt</ul><p>For all those functions the check related to the component is done at the beginning and is used like the following:</p><div class="language-c highlighter-rouge"><div class="code-header"> <span data-label-text="C"><i class="fas fa-code small"></i></span> <button aria-label="copy" data-title-succeed="Copied!"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td></tr></tbody></table></code></div></div>
+
+<p>The only component using this function is the <code class="language-plaintext highlighter-rouge">tm.sys</code> driver, which is the implementation of KTM. Inside this driver, the following functions are now using this <code class="language-plaintext highlighter-rouge">PsIsComponentEnabled</code> function :</p>
+
+<ul>
+  <li>NtCreateTransactionManagerExt</li>
+  <li>NtOpenTransactionManagerExt</li>
+  <li>NtQueryInformationTransactionManagerExt</li>
+  <li>NtRecoverTransactionManagerExt</li>
+  <li>NtRenameTransactionManagerExt</li>
+  <li>NtRollforwardTransactionManagerExt</li>
+  <li>NtSetinformationTransactionManagerExt</li>
+</ul>
+
+<p>For all those functions the check related to the component is done at the beginning and is used like the following:</p>
+
+<div class="language-c highlighter-rouge"><div class="code-header">
+        <span data-label-text="C"><i class="fas fa-code small"></i></span>
+      <button aria-label="copy" data-title-succeed="Copied!"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
 2
-</pre><td class="rouge-code"><pre><span class="k">if</span> <span class="p">(</span> <span class="o">!</span><span class="n">PsIsComponentEnabled</span><span class="p">(</span><span class="n">COMPONENT_TRANSACTION_MANAGER</span> <span class="cm">/* == 1*/</span><span class="p">)</span> <span class="p">)</span>
+</pre></td><td class="rouge-code"><pre><span class="k">if</span> <span class="p">(</span> <span class="o">!</span><span class="n">PsIsComponentEnabled</span><span class="p">(</span><span class="n">COMPONENT_TRANSACTION_MANAGER</span> <span class="cm">/* == 1*/</span><span class="p">)</span> <span class="p">)</span>
     <span class="k">return</span> <span class="mh">0xC0000022</span><span class="p">;</span>
-</pre></table></code></div></div><h2 id="using-this-new-mitigation">Using this new mitigation <a href="#using-this-new-mitigation" class="anchor"><i class="fas fa-hashtag"></i></a></h2></h2><p>As said before, you have to use the <code class="language-plaintext highlighter-rouge">UpdateProcThreadAttribute</code> function to actually spawn a process with this new mitigation. Here is a code to do so:</p><div class="language-c highlighter-rouge"><div class="code-header"> <span data-label-text="C"><i class="fas fa-code small"></i></span> <button aria-label="copy" data-title-succeed="Copied!"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td></tr></tbody></table></code></div></div>
+
+<h2 id="using-this-new-mitigation">Using this new mitigation <a href="#using-this-new-mitigation" class="anchor"><i class="fas fa-hashtag"></i></a></h2></h2>
+
+<p>As said before, you have to use the <code class="language-plaintext highlighter-rouge">UpdateProcThreadAttribute</code> function to actually spawn a process with this new mitigation. Here is a code to do so:</p>
+
+<div class="language-c highlighter-rouge"><div class="code-header">
+        <span data-label-text="C"><i class="fas fa-code small"></i></span>
+      <button aria-label="copy" data-title-succeed="Copied!"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
 2
 3
 4
@@ -47,7 +704,7 @@
 35
 36
 37
-</pre><td class="rouge-code"><pre><span class="n">STARTUPINFOEXA</span> <span class="n">si</span><span class="p">;</span>
+</pre></td><td class="rouge-code"><pre><span class="n">STARTUPINFOEXA</span> <span class="n">si</span><span class="p">;</span>
 <span class="n">PROCESS_INFORMATION</span> <span class="n">pi</span><span class="p">;</span>
 <span class="n">SIZE_T</span> <span class="n">size</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
 <span class="n">BOOL</span> <span class="n">ret</span><span class="p">;</span>
@@ -84,20 +741,217 @@
     <span class="nb">NULL</span><span class="p">,</span>
     <span class="o">&amp;</span><span class="n">si</span><span class="p">,</span>
     <span class="o">&amp;</span><span class="n">pi</span><span class="p">);</span>
-</pre></table></code></div></div><p>Once one of your process is spawned with this mitigation, you could try to create a volatile transaction manager with the following snippet, and see it fails:</p><div class="language-c highlighter-rouge"><div class="code-header"> <span data-label-text="C"><i class="fas fa-code small"></i></span> <button aria-label="copy" data-title-succeed="Copied!"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-</pre><td class="rouge-code"><pre><span class="n">CreateTransactionManager</span><span class="p">(</span><span class="nb">NULL</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">,</span> <span class="n">TRANSACTION_MANAGER_VOLATILE</span><span class="p">,</span> <span class="n">TRANSACTION_MANAGER_COMMIT_DEFAULT</span><span class="p">);</span>
-</pre></table></code></div></div><h2 id="conclusion">Conclusion <a href="#conclusion" class="anchor"><i class="fas fa-hashtag"></i></a></h2></h2><p>This new mitigation is actually a way to prevent 7 syscalls to be called within a process. Because there is no way to activate this feature outside of spawning a process with an additionnal attribute, this feature seems reserved for sandbox developers for now. As such, this mitigation is clearly niche.</p><p>However, because the field associated with this mitigation is not fully used, I’m pretty sure we will see additional components to be filtered in the same way, especially file systems components like <code class="language-plaintext highlighter-rouge">ntfs.sys</code> or <code class="language-plaintext highlighter-rouge">nfs.sys</code>.</p><h2 id="hopes-for-the-future">Hopes for the future <a href="#hopes-for-the-future" class="anchor"><i class="fas fa-hashtag"></i></a></h2></h2><p>As a defender, I’m baffled by the level of syscall filtering achieved by Linux with seccomp and seccomp-bpf, and the current level of the same feature on Windows. Especially, without going into a complete filtering mechanism capable of inspecting arguments passed to syscalls, Microsoft already has all the mechanisms to provide a correct syscall disabling feature inside the kernel, named “token privileges”. Indeed, when you look at what those privileges do, they are in fact preventing the usage of given syscalls! So, I would really appreciate if someone from Microsoft could state on the following system and if it’s planned to implement something similar or not in future.</p><p>Here is how I imagine a global syscall disabling mechanism can take place (based on how token privileges work):</p><p>At the spawn of a process, you create two bitmaps inside the <code class="language-plaintext highlighter-rouge">EPROCESS</code> structure in place of current token privileges:</p><ul><li>a bitmap defining the syscalls that can be activated by the said process<li>a bitmap defining the syscalls effectively enabled for the said process</ul><p>Basically, the first bitmap serves as the same field of the <code class="language-plaintext highlighter-rouge">Present</code> field of the <code class="language-plaintext highlighter-rouge">_SEP_TOKEN_PRIVILEGES</code> while the second one serves as the <code class="language-plaintext highlighter-rouge">Enabled</code> field.</p><p>The first bitmap can be created based on the following factors:</p><ul><li>the integrity level of the process<li>if the process is signed by Microsoft or a trusted party<li>if the process is created in special environments like Silo or AppContainers with capabilities</ul><p>The second bitmap is created by copying the first one and updated with:</p><ul><li>additional attributes given by <code class="language-plaintext highlighter-rouge">UpdateProcThreadAttribute</code>.<li>process mitigations defined</ul><p>Like token privileges, you then offer the ability to disable additional syscalls, but not the ability to activate ones that are not available inside the first bitmap.</p><p>You finally just need a little checker inside the <code class="language-plaintext highlighter-rouge">KiServiceInternal</code> function which is the following:</p><div class="language-c highlighter-rouge"><div class="code-header"> <span data-label-text="C"><i class="fas fa-code small"></i></span> <button aria-label="copy" data-title-succeed="Copied!"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td></tr></tbody></table></code></div></div>
+
+<p>Once one of your process is spawned with this mitigation, you could try to create a volatile transaction manager with the following snippet, and see it fails:</p>
+
+<div class="language-c highlighter-rouge"><div class="code-header">
+        <span data-label-text="C"><i class="fas fa-code small"></i></span>
+      <button aria-label="copy" data-title-succeed="Copied!"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre><span class="n">CreateTransactionManager</span><span class="p">(</span><span class="nb">NULL</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">,</span> <span class="n">TRANSACTION_MANAGER_VOLATILE</span><span class="p">,</span> <span class="n">TRANSACTION_MANAGER_COMMIT_DEFAULT</span><span class="p">);</span>
+</pre></td></tr></tbody></table></code></div></div>
+
+<h2 id="conclusion">Conclusion <a href="#conclusion" class="anchor"><i class="fas fa-hashtag"></i></a></h2></h2>
+
+<p>This new mitigation is actually a way to prevent 7 syscalls to be called within a process. Because there is no way to activate this feature outside of spawning a process with an additionnal attribute, this feature seems reserved for sandbox developers for now. As such, this mitigation is clearly niche.</p>
+
+<p>However, because the field associated with this mitigation is not fully used, I’m pretty sure we will see additional components to be filtered in the same way, especially file systems components like <code class="language-plaintext highlighter-rouge">ntfs.sys</code> or <code class="language-plaintext highlighter-rouge">nfs.sys</code>.</p>
+
+<h2 id="hopes-for-the-future">Hopes for the future <a href="#hopes-for-the-future" class="anchor"><i class="fas fa-hashtag"></i></a></h2></h2>
+
+<p>As a defender, I’m baffled by the level of syscall filtering achieved by Linux with seccomp and seccomp-bpf, and the current level of the same feature on Windows. Especially, without going into a complete filtering mechanism capable of inspecting arguments passed to syscalls, Microsoft already has all the mechanisms to provide a correct syscall disabling feature inside the kernel, named “token privileges”. Indeed, when you look at what those privileges do, they are in fact preventing the usage of given syscalls! So, I would really appreciate if someone from Microsoft could state on the following system and if it’s planned to implement something similar or not in future.</p>
+
+<p>Here is how I imagine a global syscall disabling mechanism can take place (based on how token privileges work):</p>
+
+<p>At the spawn of a process, you create two bitmaps inside the <code class="language-plaintext highlighter-rouge">EPROCESS</code> structure in place of current token privileges:</p>
+<ul>
+  <li>a bitmap defining the syscalls that can be activated by the said process</li>
+  <li>a bitmap defining the syscalls effectively enabled for the said process</li>
+</ul>
+
+<p>Basically, the first bitmap serves as the same field of the <code class="language-plaintext highlighter-rouge">Present</code> field of the <code class="language-plaintext highlighter-rouge">_SEP_TOKEN_PRIVILEGES</code> while the second one serves as the <code class="language-plaintext highlighter-rouge">Enabled</code> field.</p>
+
+<p>The first bitmap can be created based on the following factors:</p>
+<ul>
+  <li>the integrity level of the process</li>
+  <li>if the process is signed by Microsoft or a trusted party</li>
+  <li>if the process is created in special environments like Silo or AppContainers with capabilities</li>
+</ul>
+
+<p>The second bitmap is created by copying the first one and updated with:</p>
+<ul>
+  <li>additional attributes given by <code class="language-plaintext highlighter-rouge">UpdateProcThreadAttribute</code>.</li>
+  <li>process mitigations defined</li>
+</ul>
+
+<p>Like token privileges, you then offer the ability to disable additional syscalls, but not the ability to activate ones that are not available inside the first bitmap.</p>
+
+<p>You finally just need a little checker inside the <code class="language-plaintext highlighter-rouge">KiServiceInternal</code> function which is the following:</p>
+
+<div class="language-c highlighter-rouge"><div class="code-header">
+        <span data-label-text="C"><i class="fas fa-code small"></i></span>
+      <button aria-label="copy" data-title-succeed="Copied!"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
 2
 3
 4
 5
 6
 7
-</pre><td class="rouge-code"><pre><span class="c1">//I consider _EPROCESS-&gt;bitmapSyscallsEnabled to be a uint64_t*</span>
+</pre></td><td class="rouge-code"><pre><span class="c1">//I consider _EPROCESS-&gt;bitmapSyscallsEnabled to be a uint64_t*</span>
 <span class="cp">#define IS_SYSCALL_DISABLED(A,k) ((A[(k)/64] &amp; (1&lt;&lt;((k)%64)))) == 0
 </span>
 <span class="k">if</span><span class="p">(</span><span class="n">IS_SYSCALL_DISABLED</span><span class="p">(</span><span class="n">_EPROCESS</span><span class="o">-&gt;</span><span class="n">bitmapSyscallsEnabled</span><span class="p">,</span> <span class="o">&lt;</span><span class="n">syscall</span> <span class="n">number</span><span class="o">&gt;</span><span class="p">)</span>
   <span class="k">return</span> <span class="mh">0xc0000022</span><span class="p">;</span>
 
 <span class="p">[...]</span>
-</pre></table></code></div></div><p>With such a system, you have so :</p><ul><li>a wider scope for syscall disabling than currently implemented systems<li>one system instead of multiple ones : easier maintenance (merge of component filter, win32k lockdown, SpAccessCheck and PspIsInSilo functions) and vulnerability management<li>the possibility to have a finer grain on syscall disabling in order to provide automatic barriers between the different integrity levels (based on the integrity level, some syscalls will be automatically disabled).</ul><p>Of course, this system poses a question about performance. Microsoft certainly also chose the current implementation to support corner cases that I’m not aware about. This would also require to deprecate functions reasoning about token privileges.</p><p>To finish, I would say this system could not be complete without transforming all the “enum-based” syscalls (like the <code class="language-plaintext highlighter-rouge">NtQuery</code> and <code class="language-plaintext highlighter-rouge">NtSet</code> syscalls) into unitary syscalls. A simple example are the kernel leaks offered by the <code class="language-plaintext highlighter-rouge">NtQuerySystemInformation</code> function : those are actively used to achieve local privilege escalations from medium integrity, but they are all now under the same syscall.</p></div></div></div><div id="panel-wrapper" class="col-xl-3 pl-2 text-muted"><div class="access"><div id="access-lastmod" class="post"><div class="panel-heading">Recently Updated</div><ul class="post-content pl-0 pb-1 ml-1 mt-2"><li><a href="/posts/inside-import-address-filtering/">Inside Import Address Filtering</a><li><a href="/posts/an-analysis-of-cve-2022-21877/">An analysis of CVE-2022-21877</a></ul></div></div><script src="https://cdn.jsdelivr.net/gh/afeld/bootstrap-toc@1.0.1/dist/bootstrap-toc.min.js"></script><div id="toc-wrapper" class="pl-0 pr-4 mb-5"><div class="panel-heading pl-3 pt-2 mb-2">Contents</div><nav id="toc" data-toggle="toc"></nav></div></div></div><footer class="d-flex w-100 justify-content-center"><div class="d-flex justify-content-between align-items-center text-muted"><div class="footer-left"><p class="mb-0"> © 2023 <a href="https://github.com/Big5-sec">Zilio Nicolas</a>. <span data-toggle="tooltip" data-placement="top" title="Except where otherwise noted, the blog posts on this site are licensed under the Creative Commons Attribution 4.0 International (CC BY 4.0) License by the author.">Some rights reserved.</span></p></div><div class="footer-right"><p class="mb-0"> Powered by <a href="https://jekyllrb.com" target="_blank" rel="noopener">Jekyll</a> with <a href="https://github.com/cotes2020/jekyll-theme-chirpy" target="_blank" rel="noopener">Chirpy</a> theme.</p></div></div></footer></div><div id="search-result-wrapper" class="d-flex justify-content-center unloaded"><div class="col-12 col-sm-11 post-content"><div id="search-hints"></div><div id="search-results" class="d-flex flex-wrap justify-content-center text-muted mt-3"></div></div></div></div><div id="mask"></div><a id="back-to-top" href="#" aria-label="back-to-top" class="btn btn-lg btn-box-shadow" role="button"> <i class="fas fa-angle-up"></i> </a> <script src="https://cdn.jsdelivr.net/npm/simple-jekyll-search@1.10.0/dest/simple-jekyll-search.min.js"></script> <script> SimpleJekyllSearch({ searchInput: document.getElementById('search-input'), resultsContainer: document.getElementById('search-results'), json: '/assets/js/data/search.json', searchResultTemplate: '<div class="pl-1 pr-1 pl-sm-2 pr-sm-2 pl-lg-4 pr-lg-4 pl-xl-0 pr-xl-0"> <a href="{url}">{title}</a><div class="post-meta d-flex flex-column flex-sm-row text-muted mt-1 mb-1"> {categories} {tags}</div><p>{snippet}</p></div>', noResultsText: '<p class="mt-5">Oops! No result founds.</p>', templateMiddleware: function(prop, value, template) { if (prop === 'categories') { if (value === '') { return `${value}`; } else { return `<div class="mr-sm-4"><i class="far fa-folder fa-fw"></i>${value}</div>`; } } if (prop === 'tags') { if (value === '') { return `${value}`; } else { return `<div><i class="fa fa-tag fa-fw"></i>${value}</div>`; } } } }); </script> <script src="https://cdn.jsdelivr.net/combine/npm/lozad/dist/lozad.min.js,npm/magnific-popup@1/dist/jquery.magnific-popup.min.js,npm/clipboard@2/dist/clipboard.min.js"></script> <script src="https://cdn.jsdelivr.net/combine/npm/dayjs@1,npm/dayjs@1/locale/en.min.js,npm/dayjs@1/plugin/relativeTime.min.js,npm/dayjs@1/plugin/localizedFormat.min.js"></script> <script defer src="/assets/js/dist/post.min.js"></script> <script src="https://cdn.jsdelivr.net/combine/npm/popper.js@1.16.1,npm/bootstrap@4/dist/js/bootstrap.min.js"></script> <script defer src="/app.js"></script>
+</pre></td></tr></tbody></table></code></div></div>
+
+<p>With such a system, you have so :</p>
+<ul>
+  <li>a wider scope for syscall disabling than currently implemented systems</li>
+  <li>one system instead of multiple ones : easier maintenance (merge of component filter, win32k lockdown, SpAccessCheck and PspIsInSilo functions) and vulnerability management</li>
+  <li>the possibility to have a finer grain on syscall disabling in order to provide automatic barriers between the different integrity levels (based on the integrity level, some syscalls will be automatically disabled).</li>
+</ul>
+
+<p>Of course, this system poses a question about performance. Microsoft certainly also chose the current implementation to support corner cases that I’m not aware about. This would also require to deprecate functions reasoning about token privileges.</p>
+
+<p>To finish, I would say this system could not be complete without transforming all the “enum-based” syscalls (like the <code class="language-plaintext highlighter-rouge">NtQuery</code> and <code class="language-plaintext highlighter-rouge">NtSet</code> syscalls) into unitary syscalls. A simple example are the kernel leaks offered by the <code class="language-plaintext highlighter-rouge">NtQuerySystemInformation</code> function : those are actively used to achieve local privilege escalations from medium integrity, but they are all now under the same syscall.</p>
+
+
+</div>
+
+
+      
+    
+    
+
+    </div>
+  </div> <!-- #core-wrapper -->
+
+  <!-- pannel -->
+  <div id="panel-wrapper" class="col-xl-3 pl-2 text-muted">
+    
+      
+      
+
+
+
+<!-- BS-toc.js will be loaded at medium priority -->
+<script src="https://cdn.jsdelivr.net/gh/afeld/bootstrap-toc@1.0.1/dist/bootstrap-toc.min.js"></script>
+
+<div id="toc-wrapper" class="pl-0 pr-4 mb-5">
+  <div class="panel-heading pl-3 pt-2 mb-2">Contents</div>
+  <nav id="toc" data-toggle="toc"></nav>
+</div>
+
+
+    
+  </div>
+
+</div>
+
+<!-- tail -->
+
+
+
+      </div>
+
+      <!--
+  The Search results
+-->
+<div id="search-result-wrapper" class="d-flex justify-content-center unloaded">
+  <div class="col-12 col-sm-11 post-content">
+    <div id="search-results" class="d-flex flex-wrap justify-content-center text-muted mt-3"></div>
+  </div>
+</div>
+
+
+    </div> <!-- #main-wrapper -->
+
+    
+
+    <div id="mask"></div>
+
+    <a id="back-to-top" href="#" aria-label="back-to-top" class="btn btn-lg btn-box-shadow" role="button">
+      <i class="fas fa-angle-up"></i>
+    </a>
+
+    <!--
+  Jekyll Simple Search loader
+  See: <https://github.com/christian-fei/Simple-Jekyll-Search>
+-->
+
+
+
+
+
+<script src="https://cdn.jsdelivr.net/npm/simple-jekyll-search@1.10.0/dest/simple-jekyll-search.min.js"></script>
+
+<script>
+SimpleJekyllSearch({
+  searchInput: document.getElementById('search-input'),
+  resultsContainer: document.getElementById('search-results'),
+  json: '/assets/js/data/search.json',
+  searchResultTemplate: '<div class="pl-1 pr-1 pl-sm-2 pr-sm-2 pl-lg-4 pr-lg-4 pl-xl-0 pr-xl-0">  <a href="{url}">{title}</a>  <div class="post-meta d-flex flex-column flex-sm-row text-muted mt-1 mb-1">    {categories}    {tags}  </div>  <p>{snippet}</p></div>',
+  noResultsText: '<p class="mt-5">Oops! No result founds.</p>',
+  templateMiddleware: function(prop, value, template) {
+    if (prop === 'categories') {
+      if (value === '') {
+        return `${value}`;
+      } else {
+        return `<div class="mr-sm-4"><i class="far fa-folder fa-fw"></i>${value}</div>`;
+      }
+    }
+
+    if (prop === 'tags') {
+      if (value === '') {
+        return `${value}`;
+      } else {
+        return `<div><i class="fa fa-tag fa-fw"></i>${value}</div>`;
+      }
+    }
+  }
+});
+</script>
+
+
+    <!--
+  JS selector for site.
+-->
+
+<!-- layout specified -->
+
+
+  
+
+
+
+  <!-- image lazy-loading & popup -->
+  <script src="https://cdn.jsdelivr.net/combine/npm/lozad/dist/lozad.min.js,npm/magnific-popup@1/dist/jquery.magnific-popup.min.js,npm/clipboard@2/dist/clipboard.min.js"></script>
+
+
+
+
+  
+
+  <script src="https://cdn.jsdelivr.net/combine/npm/dayjs@1,npm/dayjs@1/locale/en.min.js,npm/dayjs@1/plugin/relativeTime.min.js,npm/dayjs@1/plugin/localizedFormat.min.js"></script>
+
+
+
+
+
+<script defer src="/assets/js/dist/post.min.js"></script>
+
+
+
+<!-- commons -->
+
+<script src="https://cdn.jsdelivr.net/combine/npm/popper.js@1.16.1,npm/bootstrap@4/dist/js/bootstrap.min.js"></script>
+
+
+
+
+  </body>
+
+</html>
+

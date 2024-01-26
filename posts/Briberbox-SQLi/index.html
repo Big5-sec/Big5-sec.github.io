@@ -25,24 +25,31 @@
 
   
 
+    
+
+    
+
+  
+
   <!-- Begin Jekyll SEO tag v2.8.0 -->
 <meta name="generator" content="Jekyll v4.3.3" />
-<meta property="og:title" content="404: Page not found" />
+<meta property="og:title" content="BrikerBox and Briker IPPBX SQL injection" />
 <meta property="og:locale" content="en" />
-<meta name="description" content="A personal blog about reverse, pwn and security" />
-<meta property="og:description" content="A personal blog about reverse, pwn and security" />
-<link rel="canonical" href="https://big5-sec.github.io/404.html" />
-<meta property="og:url" content="https://big5-sec.github.io/404.html" />
+<meta name="description" content="Details" />
+<meta property="og:description" content="Details" />
+<link rel="canonical" href="https://big5-sec.github.io/posts/Briberbox-SQLi/" />
+<meta property="og:url" content="https://big5-sec.github.io/posts/Briberbox-SQLi/" />
 <meta property="og:site_name" content="yar-eb" />
-<meta property="og:type" content="website" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2024-01-25T22:50:40+01:00" />
 <meta name="twitter:card" content="summary" />
-<meta property="twitter:title" content="404: Page not found" />
+<meta property="twitter:title" content="BrikerBox and Briker IPPBX SQL injection" />
 <script type="application/ld+json">
-{"@context":"https://schema.org","@type":"WebPage","description":"A personal blog about reverse, pwn and security","headline":"404: Page not found","url":"https://big5-sec.github.io/404.html"}</script>
+{"@context":"https://schema.org","@type":"BlogPosting","dateModified":"2024-01-25T22:50:40+01:00","datePublished":"2024-01-25T22:50:40+01:00","description":"Details","headline":"BrikerBox and Briker IPPBX SQL injection","mainEntityOfPage":{"@type":"WebPage","@id":"https://big5-sec.github.io/posts/Briberbox-SQLi/"},"url":"https://big5-sec.github.io/posts/Briberbox-SQLi/"}</script>
 <!-- End Jekyll SEO tag -->
 
 
-  <title>404: Page not found | yar-eb
+  <title>BrikerBox and Briker IPPBX SQL injection | yar-eb
   </title>
 
   <!--
@@ -87,6 +94,9 @@
 
 <link rel="stylesheet" href="/assets/css/style.css">
 
+
+  <link rel="stylesheet"
+    href="https://cdn.jsdelivr.net/gh/afeld/bootstrap-toc@1.0.1/dist/bootstrap-toc.min.css">
 
 
 
@@ -197,14 +207,17 @@
   <div id="topbar" class="col-11 d-flex h-100 align-items-center justify-content-between">
     <span id="breadcrumb">
       
-        <span>404: Page not found</span>
+        
+          <span><a href="/advisories">Advisories</a></span>
+          <span>BrikerBox and Briker IPPBX SQL injection</span>
+        
       
     </span><!-- endof #breadcrumb -->
 
     <i id="sidebar-trigger" class="fas fa-bars fa-fw"></i>
 
     <div id="topbar-title">
-      404: Page not found
+      Post
     </div>
 
     <i id="search-trigger" class="fas fa-search fa-fw"></i>
@@ -237,11 +250,6 @@
 
     
       
-      <h1 class="dynamic-title">
-        404: Page not found
-      </h1>
-      <div class="post-content">
-        
       
         <!--
   Refactor the HTML structure.
@@ -321,17 +329,112 @@
 
 
 
-<div class="lead"><p>Sorry, we've misplaced that URL or it's pointing to something that doesn't exist.</p>
 
-  <p><a href="/">Head back Home</a> to try finding it again, or search for it on the <a href="/archives">Archives page</a>.
-  </p>
+
+<h1 data-toc-skip>BrikerBox and Briker IPPBX SQL injection</h1>
+
+<div class="post-meta text-muted">
+
+  <!-- author -->
+  <!-- <div>
+    
+    
+
+    
+
+    By
+    <em>
+      
+        <a href="https://github.com/Big5-sec">Zilio Nicolas</a>
+      
+    </em>
+  </div> -->
+
+  <div class="d-flex">
+    <div>
+      <!-- published date -->
+      <span>
+        Posted
+        <!--
+  Date format snippet
+  See: ${JS_ROOT}/utils/timeago.js
+-->
+
+<em class="timeago"
+    data-ts="1706219440"
+    
+      data-toggle="tooltip" data-placement="bottom" data-tooltip-df="llll"
+    
+    >
+  2024-01-25
+</em>
+
+      </span>
+
+      <!-- lastmod date -->
+      
+
+      <!-- read time -->
+      <!--
+  Calculate the post's reading time, and display the word count in tooltip
+ -->
+
+
+
+<!-- words per minute  -->
+
+
+
+
+
+
+
+
+
+
+<!-- return element -->
+<span class="readtime" data-toggle="tooltip" data-placement="bottom"
+  title="139 words">
+  <em>1 min</em> read</span>
+
+
+      <!-- page views -->
+      <!--  -->
+    </div>
+
+  </div> <!-- .d-flex -->
+
+</div> <!-- .post-meta -->
+
+<div class="post-content">
+  <h1 id="details">Details</h1>
+
+<p>At the start of August, an advertisement popped on cybercrime forums for a 0day affecting both the open-source and the paid version (<a href="https://itmn.co.id/brikerbox/ar1500s/">Brikerbox</a>) of the <a href="https://www.briker.org/">Briker IPPBX</a> software, used mostly in Indonesia. Following more in-depth investigation, it was possible to uncover the vulnerability:</p>
+
+<p>In the <code class="language-plaintext highlighter-rouge">/var/www/apps/ippbx/recordings/includes/main.conf.php</code> file (reachable directly), there is a SQLi at line 76:</p>
+
+<div class="language-php highlighter-rouge"><div class="code-header">
+        <span data-label-text="PHP"><i class="fas fa-code small"></i></span>
+      <button aria-label="copy" data-title-succeed="Copied!"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre><span class="nv">$db_query</span> <span class="o">=</span> <span class="s2">"SELECT password FROM mi_tblUser WHERE status='2' AND username = '"</span><span class="mf">.</span><span class="nv">$_POST</span><span class="p">[</span><span class="s1">'username'</span><span class="p">]</span><span class="mf">.</span><span class="s2">""</span><span class="p">;</span>
+</pre></td></tr></tbody></table></code></div></div>
+
+<p>As this file is part of the login flow, it allows for unauthenticated attack, in particular against the following endpoints:</p>
+
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">/apps/ippbx/recordings/recordings.php</code></li>
+  <li><code class="language-plaintext highlighter-rouge">/apps/userportal/userportal.php</code> -&gt; authentication page of the appliance</li>
+</ul>
+
+<p>Users credentials being stored in clear text in the database, using SQLi to obtain an admin account is straightforward.</p>
+
+<p>BrikerBox vendor was contacted late August 2023. Previously exposed instances appear unreachable anymore. Still, Brikker IPPBX- the open-source version- is still vulnerable.</p>
 
 </div>
 
 
       
     
-      </div>
     
 
     </div>
@@ -339,6 +442,13 @@
 
   <!-- pannel -->
   <div id="panel-wrapper" class="col-xl-3 pl-2 text-muted">
+    
+      
+      
+
+
+
+
     
   </div>
 
@@ -416,6 +526,8 @@ SimpleJekyllSearch({
 <!-- layout specified -->
 
 
+  
+
 
 
   <!-- image lazy-loading & popup -->
@@ -424,10 +536,15 @@ SimpleJekyllSearch({
 
 
 
+  
+
+  <script src="https://cdn.jsdelivr.net/combine/npm/dayjs@1,npm/dayjs@1/locale/en.min.js,npm/dayjs@1/plugin/relativeTime.min.js,npm/dayjs@1/plugin/localizedFormat.min.js"></script>
 
 
 
-<script defer src="/assets/js/dist/page.min.js"></script>
+
+
+<script defer src="/assets/js/dist/post.min.js"></script>
 
 
 
