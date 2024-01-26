@@ -7,7 +7,7 @@ order: 1
 <div id="post-list">
 
 {% for post in site.posts %}
-  {% if post.category == "blogpost" %}
+  {% if post.category == "blogpost" and post.details_ok == true %}
   <div class="post-preview">
     <h1>
       <a href="{{ post.url | relative_url }}">{{ post.title }}</a>

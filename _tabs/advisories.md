@@ -4,16 +4,32 @@ title: Advisories
 icon: fas fa-bug
 order: 2
 ---
-<div id="post-list">
+The following vulnerabilities were found through original research.
 
-{% for post in site.posts %}
-  {% if post.category == "advisory" %}
-  <div class="post-preview">
-    <h1>
-      <a href="{{ post.url | relative_url }}">{{ post.title }}</a>
-    </h1>
-  </div> <!-- .post-review -->
+{% assign sorted = site.posts | sort: 'date_cve' | reverse %}
+
+<br/>
+<table>
+<thead>
+  <tr><th>Date</th><th>CVE</th><th>Title</th></tr>
+</thead>
+<tbody>
+{% for post in sorted %}
+  {% if post.inadvisory == true %}
+  <tr>
+    <td>{{ post.date_cve }}</td>
+    <td>{{ post.cve }}</td>
+    <td>{{ post.advisory_title }}</td>
+    <td>
+      {% if post.details_ok == true %}
+        <a href="{{ post.url | relative_url }}">details</a>
+      {% else %}
+        details incoming...
+      {% endif %}
+    </td>
+  </tr>
   {% endif %}
 {% endfor %}
 
-</div> <!-- #post-list -->
+</tbody>
+</table>
