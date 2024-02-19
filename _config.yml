@@ -98,7 +98,7 @@ toc: true
 #     repo:         # <gh-username>/<repo>
 #     issue_term:   # < url | pathname | title | ...>
 
-paginate: 10
+paginate: 5
 
 # ------------ The following options are not recommended to be modified ------------------
 

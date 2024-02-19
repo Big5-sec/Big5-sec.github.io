@@ -1,4 +1,142 @@
 ---
-layout: home
+layout: page
 # Index page
 ---
+
+{% assign default = paginator.posts %}
+{% assign posts = "" | split: "" %}
+
+
+<blockquote>
+    <p>The site is still under construction, please be indulgent.</p>
+</blockquote>
+
+<h1 class="dynamic-title">Welcome</h1>
+
+<p>Welcome to another blog of just another guy interested in vulnerability research and reverse engineering.
+    Because I learned a lot from random posts on internet, and I’m interested by ever
+    learning/challenging myself, I decided to create this blog to share back to the community
+    and write down my adventures. Let's hope some people will find it interesting!</p>
+
+<p>Within the Blogposts section, you'll find posts containing detailed analyses. Within the Advisories section, you'll find quick details about some of the vulnerabilities I have reported. I indeed believe that documenting and publishing details about vulnerabilities help a lot defenders.</p>
+
+<p>If you have any remark/question/correction to give out, feel free to reach out to me via <a href="https://twitter.com/Big5_sec">Twitter</a> or <a href="dead">LinkedIn</a></p>
+
+<!-- blogposts -->
+<h1 class="dynamic-title">Blogposts</h1>
+
+{% assign default_beg = 0 %}
+
+{% assign default_num = paginator.per_page %}
+{% assign default_end = default_beg | plus: default_num | minus: 1 %}
+
+{% if default_num > 0 %}
+{% for i in (default_beg..default_end) %}
+{% assign posts = posts | push: default[i] %}
+{% endfor %}
+{% endif %}
+
+<div id="post-list">
+
+    {% for post in posts %}
+
+    <div class="post-preview d-flex" style="align-items: center;">
+        <div class="mr-auto p-2"><a href="{{ post.url | relative_url }}">{{ post.title }}</a></div>
+        <div class="p-2 post-meta text-muted">
+            <i class="far fa-calendar fa-fw" style="vertical-align: sub;"></i>
+            <em style="vertical-align: sub;"> {{ post.date | date: '%Y-%m-%d' }}</em>
+        </div>
+        <div class="p-2 post-meta text-muted">
+            <!-- time to read -->
+            <i class="far fa-clock fa-fw" style="vertical-align: sub;"></i>
+            {% include read-time.html content=post.content %}
+        </div>
+
+
+    </div> <!-- .post-review -->
+
+    {% endfor %}
+
+</div> <!-- #post-list -->
+
+{% if paginator.total_pages > 0 %}
+{% include post-paginator.html %}
+{% endif %}
+
+
+<br />
+
+<!-- advisories -->
+
+<h1 class="dynamic-title">Advisories</h1>
+
+The following vulnerabilities were found through original research, mostly through variant analysis while
+analyzing/reversing exploitation campaigns.
+<br />
+{% assign sorted = site.posts | sort: 'date_cve' | reverse %}
+
+<br />
+<table>
+    <thead>
+        <tr>
+            <th>Date</th>
+            <th>CVE</th>
+            <th>Title</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for post in sorted %}
+        {% if post.inadvisory == true %}
+        <tr>
+            <td>{{ post.date_cve }}</td>
+            <td>{{ post.cve }}</td>
+            <td>{{ post.advisory_title }}</td>
+            <td>
+                {% if post.details_ok == true %}
+                <a href="{{ post.url | relative_url }}">details</a>
+                {% else %}
+                details incoming...
+                {% endif %}
+            </td>
+        </tr>
+        {% endif %}
+        {% endfor %}
+
+    </tbody>
+</table>
+
+<br />
+
+<!-- ext publications -->
+
+<h1 class="dynamic-title">External publications</h1>
+
+<div id="post-list">
+
+    <div class="post-preview d-flex" style="align-items: center;">
+        <div class="mr-auto p-2"><a
+                href="https://www.crowdstrike.com/blog/how-malicious-insiders-use-known-vulnerabilities-against-organizations/">Reporting
+                on vulnerabilities usage by insiders</a>
+        </div>
+        <div class="p-2 post-meta text-muted">
+            <em style="vertical-align: text-top;">CrowdStrike.com</em>
+        </div>
+    </div>
+
+    <div class="post-preview d-flex" style="align-items: center;">
+        <div class="mr-auto p-2"><a
+                href="https://www.crowdstrike.com/blog/falcon-complete-zero-day-exploit-cve-2023-36874/">Analysis of
+                CVE-2023-36874</a>
+        </div>
+        <div class="p-2 post-meta text-muted">
+            <em style="vertical-align: text-top;">CrowdStrike.com</em>
+        </div>
+    </div> <!-- .post-review -->
+
+</div> <!-- #post-list -->
+
+<br />
+
+<!-- projects -->
+
+<h1 class="dynamic-title">Projects</h1>
