@@ -4,7 +4,7 @@
   <id>https://big5-sec.github.io/</id>
   <title>yar-eb</title>
   <subtitle>A personal blog about reverse, pwn and security</subtitle>
-  <updated>2024-02-19T12:16:45+01:00</updated>
+  <updated>2024-02-19T14:43:55+01:00</updated>
   <author>
     <name>Zilio Nicolas</name>
     <uri>https://big5-sec.github.io/</uri>
@@ -22,9 +22,9 @@
   <entry>
     <title>ColdFusion RCE using WDDX deserialization - Story and details behind CVE-2023-26359 and CVE-2023-29300</title>
     <link href="https://big5-sec.github.io/posts/ColdFusion-WDDX-2023/" rel="alternate" type="text/html" title="ColdFusion RCE using WDDX deserialization - Story and details behind CVE-2023-26359 and CVE-2023-29300" />
-    <published>2024-02-14T22:50:40+01:00</published>
+    <published>2024-02-19T10:50:40+01:00</published>
   
-    <updated>2024-02-14T22:50:40+01:00</updated>
+    <updated>2024-02-19T14:43:41+01:00</updated>
   
     <id>https://big5-sec.github.io/posts/ColdFusion-WDDX-2023/</id>
     <content src="https://big5-sec.github.io/posts/ColdFusion-WDDX-2023/" />

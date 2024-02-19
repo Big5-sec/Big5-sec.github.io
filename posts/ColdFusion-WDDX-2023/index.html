@@ -41,11 +41,11 @@
 <meta property="og:url" content="https://big5-sec.github.io/posts/ColdFusion-WDDX-2023/" />
 <meta property="og:site_name" content="yar-eb" />
 <meta property="og:type" content="article" />
-<meta property="article:published_time" content="2024-02-14T22:50:40+01:00" />
+<meta property="article:published_time" content="2024-02-19T10:50:40+01:00" />
 <meta name="twitter:card" content="summary" />
 <meta property="twitter:title" content="ColdFusion RCE using WDDX deserialization - Story and details behind CVE-2023-26359 and CVE-2023-29300" />
 <script type="application/ld+json">
-{"@context":"https://schema.org","@type":"BlogPosting","dateModified":"2024-02-14T22:50:40+01:00","datePublished":"2024-02-14T22:50:40+01:00","description":"I would like to thank Patrick Vares for his tremendous help analyzing CVE-2023-26359 and its consequences","headline":"ColdFusion RCE using WDDX deserialization - Story and details behind CVE-2023-26359 and CVE-2023-29300","mainEntityOfPage":{"@type":"WebPage","@id":"https://big5-sec.github.io/posts/ColdFusion-WDDX-2023/"},"url":"https://big5-sec.github.io/posts/ColdFusion-WDDX-2023/"}</script>
+{"@context":"https://schema.org","@type":"BlogPosting","dateModified":"2024-02-19T14:43:41+01:00","datePublished":"2024-02-19T10:50:40+01:00","description":"I would like to thank Patrick Vares for his tremendous help analyzing CVE-2023-26359 and its consequences","headline":"ColdFusion RCE using WDDX deserialization - Story and details behind CVE-2023-26359 and CVE-2023-29300","mainEntityOfPage":{"@type":"WebPage","@id":"https://big5-sec.github.io/posts/ColdFusion-WDDX-2023/"},"url":"https://big5-sec.github.io/posts/ColdFusion-WDDX-2023/"}</script>
 <!-- End Jekyll SEO tag -->
 
 
@@ -578,17 +578,35 @@
 -->
 
 <em class="timeago"
-    data-ts="1707947440"
+    data-ts="1708336240"
     
       data-toggle="tooltip" data-placement="bottom" data-tooltip-df="llll"
     
     >
-  2024-02-14
+  2024-02-19
 </em>
 
       </span>
 
       <!-- lastmod date -->
+      
+      <span>
+        Updated
+        <!--
+  Date format snippet
+  See: ${JS_ROOT}/utils/timeago.js
+-->
+
+<em class="timeago"
+    data-ts="1708350221"
+    
+      data-toggle="tooltip" data-placement="bottom" data-tooltip-df="llll"
+    
+    >
+  2024-02-19
+</em>
+
+      </span>
       
 
       <!-- read time -->
@@ -611,7 +629,7 @@
 
 <!-- return element -->
 <span class="readtime" data-toggle="tooltip" data-placement="bottom"
-  title="1956 words" style="vertical-align: sub;">
+  title="1939 words" style="vertical-align: sub;">
   <em>10 min</em> read</span>
 
 
@@ -682,7 +700,7 @@ argumentCollection=&lt;wddxPacket+version="1.0"&gt;&lt;header/&gt;&lt;data&gt;&l
 <ul>
   <li><em>chain1</em> was tied to CVE-2023-26360</li>
   <li><em>chain2</em> was tied to CVE-2023-26359</li>
-  <li><strong>CVE-2023-26359 was used as a 0day</strong>. And Patrick Vares who reported it actually did so after a thorough and nice investigation of two compromised ColdFusion servers. As of this writing, Adobe refused to indicate this in their bulletins, and I do believe the inclusion of CVE-2023-26359 in CISA KEV list was done after CrowdStrike reporting.</li>
+  <li><strong>CVE-2023-26359 was used as a 0day</strong>. And Patrick Vares who reported it actually did so after a thorough and nice investigation of two compromised ColdFusion servers. As of this writing, Adobe refused to indicate this in their bulletins.</li>
   <li><strong>All code changes in ColdFusion 2021 patch were pertaining to CVE-2023-26360. Somehow, CVE-2023-26359 is intact there.</strong></li>
 </ul>
 
