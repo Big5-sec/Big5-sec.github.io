@@ -11,10 +11,6 @@ const resource = [
   '/index.html',
   '/404.html',
   
-    '/blogposts/',
-  
-    '/advisories/',
-  
 
   /* --- Favicons & compressed JS --- */
   

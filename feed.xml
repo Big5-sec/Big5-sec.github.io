@@ -4,7 +4,7 @@
   <id>https://big5-sec.github.io/</id>
   <title>yar-eb</title>
   <subtitle>A personal blog about reverse, pwn and security</subtitle>
-  <updated>2024-01-26T21:51:14+01:00</updated>
+  <updated>2024-02-19T12:16:45+01:00</updated>
   <author>
     <name>Zilio Nicolas</name>
     <uri>https://big5-sec.github.io/</uri>
@@ -20,21 +20,21 @@
 
   
   <entry>
-    <title>RabbitMQ Server for Windows LPE</title>
-    <link href="https://big5-sec.github.io/posts/RabbitMQ-server-LPE/" rel="alternate" type="text/html" title="RabbitMQ Server for Windows LPE" />
-    <published>2024-01-25T22:50:40+01:00</published>
+    <title>ColdFusion RCE using WDDX deserialization - Story and details behind CVE-2023-26359 and CVE-2023-29300</title>
+    <link href="https://big5-sec.github.io/posts/ColdFusion-WDDX-2023/" rel="alternate" type="text/html" title="ColdFusion RCE using WDDX deserialization - Story and details behind CVE-2023-26359 and CVE-2023-29300" />
+    <published>2024-02-14T22:50:40+01:00</published>
   
-    <updated>2024-01-25T22:50:40+01:00</updated>
+    <updated>2024-02-14T22:50:40+01:00</updated>
   
-    <id>https://big5-sec.github.io/posts/RabbitMQ-server-LPE/</id>
-    <content src="https://big5-sec.github.io/posts/RabbitMQ-server-LPE/" />
+    <id>https://big5-sec.github.io/posts/ColdFusion-WDDX-2023/</id>
+    <content src="https://big5-sec.github.io/posts/ColdFusion-WDDX-2023/" />
     <author>
       <name>Zilio Nicolas</name>
     </author>
 
   
     
-    <category term="advisory" />
+    <category term="blogpost" />
     
   
 
@@ -46,8 +46,11 @@
 
 
 
-      to come
+      I would like to thank Patrick Vares for his tremendous help analyzing CVE-2023-26359 and its consequences
 
+WDDX Deserialization as the culprit behind these vulnerabilities
+
+A ColdFusion application is typically composed of ColdFusion Components (CFC) and ColdFusion templates (CFM), which are respectively implemented in .cfc or .cfm files. Templates offer webpage skeletons, with CFC forming the ...
     </summary>
   
 
@@ -86,41 +89,6 @@
 A SQL injection can be triggered through header crafting, for MySQL backend, in moveitisapi.dll. This SQLi can only be triggered authenticated, and I do not know if there is a configuration under which it could have beeen exploited. So clearly this vulnerability would fall under the Low or even None severity.
 
 To note: I’m almost certain that CVE-2023-36932 describes multiple SQL injecti...
-    </summary>
-  
-
-  </entry>
-
-  
-  <entry>
-    <title>ColdFusion RCE using WDDX deserialization - Story and details behind CVE-2023-26359 and CVE-2023-29300</title>
-    <link href="https://big5-sec.github.io/posts/ColdFusion-WDDX-2023/" rel="alternate" type="text/html" title="ColdFusion RCE using WDDX deserialization - Story and details behind CVE-2023-26359 and CVE-2023-29300" />
-    <published>2024-01-25T22:50:40+01:00</published>
-  
-    <updated>2024-01-25T22:50:40+01:00</updated>
-  
-    <id>https://big5-sec.github.io/posts/ColdFusion-WDDX-2023/</id>
-    <content src="https://big5-sec.github.io/posts/ColdFusion-WDDX-2023/" />
-    <author>
-      <name>Zilio Nicolas</name>
-    </author>
-
-  
-    
-    <category term="blogpost" />
-    
-  
-
-  
-    <summary>
-      
-
-
-
-
-
-      see
-
     </summary>
   
 
@@ -170,7 +138,7 @@ In the /var/www/apps/ippbx/recordings/includes/main.conf.php file (reachable dir
     <link href="https://big5-sec.github.io/posts/cve-2023-5350-SuiteCRM-SQLi/" rel="alternate" type="text/html" title="CVE-2023-5350 - SuiteCRM < v7.14.0 authenticated SQL injection" />
     <published>2024-01-11T02:50:40+01:00</published>
   
-    <updated>2024-01-26T21:50:48+01:00</updated>
+    <updated>2024-01-11T02:50:40+01:00</updated>
   
     <id>https://big5-sec.github.io/posts/cve-2023-5350-SuiteCRM-SQLi/</id>
     <content src="https://big5-sec.github.io/posts/cve-2023-5350-SuiteCRM-SQLi/" />
@@ -199,6 +167,45 @@ Authenticated SQL injection affecting the Opportunities module of SuiteCRM for v
 Details
 
 At CrowdStrike, following claims from a threat actor to have hacked SuiteCRM at multiple entities using a SQL injection, I started a little audit of SuiteCRM to uncover whether the threat was realistic or not. Upon research, I stumbled on the modules/Opportunities/Save.php fi...
+    </summary>
+  
+
+  </entry>
+
+  
+  <entry>
+    <title>A look at CVE-2023-29360, a beautiful logical LPE vuln</title>
+    <link href="https://big5-sec.github.io/posts/CVE-2023-29360-analysis/" rel="alternate" type="text/html" title="A look at CVE-2023-29360, a beautiful logical LPE vuln" />
+    <published>2023-08-18T22:50:40+01:00</published>
+  
+    <updated>2024-02-19T12:10:46+01:00</updated>
+  
+    <id>https://big5-sec.github.io/posts/CVE-2023-29360-analysis/</id>
+    <content src="https://big5-sec.github.io/posts/CVE-2023-29360-analysis/" />
+    <author>
+      <name>Zilio Nicolas</name>
+    </author>
+
+  
+    
+    <category term="blogpost" />
+    
+  
+
+  
+    <summary>
+      
+
+
+
+
+
+      Introduction
+
+When looking for vulnerabilities of interest, it’s always a good option to look for vulnerabilities used at pwn2own. Indeed, these vulnerabilities are exploited during the competition, meaning they indeed have a practical impact. This year, I got my interest piqued during my freetime by a LPE (CVE-2023-29360) reported by Thomas Imbert(@masthoon) for the following reasons:
+
+
+  Thom...
     </summary>
   
 
