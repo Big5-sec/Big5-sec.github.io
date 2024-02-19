@@ -45,7 +45,7 @@
 <meta name="twitter:card" content="summary" />
 <meta property="twitter:title" content="ColdFusion RCE using WDDX deserialization - Story and details behind CVE-2023-26359 and CVE-2023-29300" />
 <script type="application/ld+json">
-{"@context":"https://schema.org","@type":"BlogPosting","dateModified":"2024-02-19T14:43:41+01:00","datePublished":"2024-02-19T10:50:40+01:00","description":"I would like to thank Patrick Vares for his tremendous help analyzing CVE-2023-26359 and its consequences","headline":"ColdFusion RCE using WDDX deserialization - Story and details behind CVE-2023-26359 and CVE-2023-29300","mainEntityOfPage":{"@type":"WebPage","@id":"https://big5-sec.github.io/posts/ColdFusion-WDDX-2023/"},"url":"https://big5-sec.github.io/posts/ColdFusion-WDDX-2023/"}</script>
+{"@context":"https://schema.org","@type":"BlogPosting","dateModified":"2024-02-19T14:53:31+01:00","datePublished":"2024-02-19T10:50:40+01:00","description":"I would like to thank Patrick Vares for his tremendous help analyzing CVE-2023-26359 and its consequences","headline":"ColdFusion RCE using WDDX deserialization - Story and details behind CVE-2023-26359 and CVE-2023-29300","mainEntityOfPage":{"@type":"WebPage","@id":"https://big5-sec.github.io/posts/ColdFusion-WDDX-2023/"},"url":"https://big5-sec.github.io/posts/ColdFusion-WDDX-2023/"}</script>
 <!-- End Jekyll SEO tag -->
 
 
@@ -598,7 +598,7 @@
 -->
 
 <em class="timeago"
-    data-ts="1708350221"
+    data-ts="1708350811"
     
       data-toggle="tooltip" data-placement="bottom" data-tooltip-df="llll"
     
@@ -629,7 +629,7 @@
 
 <!-- return element -->
 <span class="readtime" data-toggle="tooltip" data-placement="bottom"
-  title="1939 words" style="vertical-align: sub;">
+  title="1934 words" style="vertical-align: sub;">
   <em>10 min</em> read</span>
 
 
@@ -878,7 +878,7 @@ The specific sequence of files included or processed is: &lt;endpoint used by at
 <div class="language-plaintext highlighter-rouge"><div class="code-header">
         <span data-label-text="Plaintext"><i class="fas fa-code small"></i></span>
       <button aria-label="copy" data-title-succeed="Copied!"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-</pre></td><td class="rouge-code"><pre>alert http $EXTERNAL_NET any -&gt; $COLDFUSION_SERVER_IP $COLDFUSION_SERVER_PORT (msg: "CrowdStrike -  potential ColdFusion 2023 deserialization exploit attempt"; flow:to_server, established; http.method; content:"POST"; http.uri; content:".cfc"; nocase; http.request_body; url_decode; content:"argumentCollection"; http.request_body; url_decode; content:"wddxPacket"; distance:1; within:12; http.request_body; url_decode; content:"struct type"; http.request_body; url_decode; content:!"coldfusion"; distance:1; within:12; sid:XXXXXXXX; rev:XXXXXXX;)
+</pre></td><td class="rouge-code"><pre>alert http $EXTERNAL_NET any -&gt; $COLDFUSION_SERVER_IP $COLDFUSION_SERVER_PORT (msg: "potential ColdFusion 2023 WDDX deserialization exploit attempt"; flow:to_server, established; http.method; content:"POST"; http.uri; content:".cfc"; nocase; http.request_body; content:"argumentCollection"; http.request_body;  content:"wddxPacket"; distance:1; within:12; http.request_body; content:"struct type"; http.request_body; content:!"coldfusion"; distance:1; within:12; sid:XXXXXXXX; rev:XXXXXXX;)
 </pre></td></tr></tbody></table></code></div></div>
 
 <h1 id="conclusion">Conclusion</h1>
