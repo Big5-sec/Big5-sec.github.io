@@ -175,7 +175,7 @@ It should be noted the presence of this error does not mean for sure that exploi
 Setting an efficient request blocking is not an easy task for the exploits leveraging those vulnerabilities, given the possible variants on the initial class used for deserialization, the possibility of request encoding, the GET/POST variant and the need for legitimate uses in production code. The following Suricata rule aims at detecting, for the basic payloads, whenever a non-ColdFusion class is used in WDDX data within a POST request. 
 
 ```
-alert http $EXTERNAL_NET any -> $COLDFUSION_SERVER_IP $COLDFUSION_SERVER_PORT (msg: "CrowdStrike -  potential ColdFusion 2023 deserialization exploit attempt"; flow:to_server, established; http.method; content:"POST"; http.uri; content:".cfc"; nocase; http.request_body; url_decode; content:"argumentCollection"; http.request_body; url_decode; content:"wddxPacket"; distance:1; within:12; http.request_body; url_decode; content:"struct type"; http.request_body; url_decode; content:!"coldfusion"; distance:1; within:12; sid:XXXXXXXX; rev:XXXXXXX;)
+alert http $EXTERNAL_NET any -> $COLDFUSION_SERVER_IP $COLDFUSION_SERVER_PORT (msg: "potential ColdFusion 2023 WDDX deserialization exploit attempt"; flow:to_server, established; http.method; content:"POST"; http.uri; content:".cfc"; nocase; http.request_body; content:"argumentCollection"; http.request_body;  content:"wddxPacket"; distance:1; within:12; http.request_body; content:"struct type"; http.request_body; content:!"coldfusion"; distance:1; within:12; sid:XXXXXXXX; rev:XXXXXXX;)
 ```
 
 # Conclusion
