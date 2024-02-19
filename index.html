@@ -18,9 +18,12 @@ layout: page
     learning/challenging myself, I decided to create this blog to share back to the community
     and write down my adventures. Let's hope some people will find it interesting!</p>
 
-<p>Within the Blogposts section, you'll find posts containing detailed analyses. Within the Advisories section, you'll find quick details about some of the vulnerabilities I have reported. I indeed believe that documenting and publishing details about vulnerabilities help a lot defenders.</p>
+<p>Within the Blogposts section, you'll find posts containing detailed analyses. Within the Advisories section, you'll
+    find quick details about some of the vulnerabilities I have reported. I indeed believe that documenting and
+    publishing details about vulnerabilities help a lot defenders.</p>
 
-<p>If you have any remark/question/correction to give out, feel free to reach out to me via <a href="https://twitter.com/Big5_sec">Twitter</a> or <a href="dead">LinkedIn</a></p>
+<p>If you have any remark/question/correction to give out, feel free to reach out to me via <a
+        href="https://twitter.com/Big5_sec">Twitter</a> or <a href="www.linkedin.com/in/nicolas-zilio-08b004130">LinkedIn</a></p>
 
 <!-- blogposts -->
 <h1 class="dynamic-title">Blogposts</h1>
@@ -41,12 +44,12 @@ layout: page
     {% for post in posts %}
 
     <div class="post-preview d-flex" style="align-items: center;">
-        <div class="mr-auto p-2"><a href="{{ post.url | relative_url }}">{{ post.title }}</a></div>
-        <div class="p-2 post-meta text-muted">
+        <div class="mr-auto p-2" style="width: 75%!important;"><a href="{{ post.url | relative_url }}">{{ post.title }}</a></div>
+        <div class="p-2 post-meta text-muted" style="width: 15%!important;">
             <i class="far fa-calendar fa-fw" style="vertical-align: sub;"></i>
             <em style="vertical-align: sub;"> {{ post.date | date: '%Y-%m-%d' }}</em>
         </div>
-        <div class="p-2 post-meta text-muted">
+        <div class="p-2 post-meta text-muted" style="width: 10%!important;">
             <!-- time to read -->
             <i class="far fa-clock fa-fw" style="vertical-align: sub;"></i>
             {% include read-time.html content=post.content %}
@@ -114,21 +117,42 @@ analyzing/reversing exploitation campaigns.
 <div id="post-list">
 
     <div class="post-preview d-flex" style="align-items: center;">
-        <div class="mr-auto p-2"><a
+        <div class="mr-auto p-2" style="width: 65%!important;"><a
                 href="https://www.crowdstrike.com/blog/how-malicious-insiders-use-known-vulnerabilities-against-organizations/">Reporting
                 on vulnerabilities usage by insiders</a>
         </div>
-        <div class="p-2 post-meta text-muted">
+        <div class="p-2 post-meta text-muted" style="width: 15%!important;">
+            <i class="far fa-calendar fa-fw" style="vertical-align: sub;"></i>
+            <em style="vertical-align: sub;">2023-12-07</em>
+        </div>
+        <div class="p-2 post-meta text-muted" style="width: 20%!important;">
             <em style="vertical-align: text-top;">CrowdStrike.com</em>
         </div>
     </div>
 
     <div class="post-preview d-flex" style="align-items: center;">
-        <div class="mr-auto p-2"><a
+        <div class="mr-auto p-2" style="width: 65%!important;"><a
                 href="https://www.crowdstrike.com/blog/falcon-complete-zero-day-exploit-cve-2023-36874/">Analysis of
                 CVE-2023-36874</a>
         </div>
-        <div class="p-2 post-meta text-muted">
+        <div class="p-2 post-meta text-muted" style="width: 15%!important;">
+            <i class="far fa-calendar fa-fw" style="vertical-align: sub;"></i>
+            <em style="vertical-align: sub;">2023-08-10</em>
+        </div>
+        <div class="p-2 post-meta text-muted" style="width: 20%!important;">
+            <em style="vertical-align: text-top;">CrowdStrike.com</em>
+        </div>
+    </div> <!-- .post-review -->
+
+    <div class="post-preview d-flex" style="align-items: center;">
+        <div class="mr-auto p-2" style="width: 65%!important;"><a
+                href="https://www.crowdstrike.com/blog/owassrf-exploit-analysis-and-recommendations/">Discovery of CVE-2022-41080 usage in-the-wild</a>
+        </div>
+        <div class="p-2 post-meta text-muted" style="width: 15%!important;">
+            <i class="far fa-calendar fa-fw" style="vertical-align: sub;"></i>
+            <em style="vertical-align: sub;">2022-12-20</em>
+        </div>
+        <div class="p-2 post-meta text-muted" style="width: 20%!important;">
             <em style="vertical-align: text-top;">CrowdStrike.com</em>
         </div>
     </div> <!-- .post-review -->
@@ -140,3 +164,10 @@ analyzing/reversing exploitation campaigns.
 <!-- projects -->
 
 <h1 class="dynamic-title">Projects</h1>
+
+<ul>
+    <li><a href="https://github.com/Big5-sec/pcode2code">pcode2code</a>: a VBA pcode decompiler based on pcodedmp tool
+        useful when dealing with <a href="https://vbastomp.com/">VBA stomped</a> malicious office documents</li>
+    <li><a href="https://github.com/Big5-sec/SourceFu">SourceFu</a>: an experiment at creating a deobfuscation tool
+        based on partial grammar interpretation and ANTLR. It was quite a fail though when presented to public.</li>
+</ul>

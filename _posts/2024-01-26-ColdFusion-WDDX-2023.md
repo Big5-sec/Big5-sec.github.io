@@ -1,7 +1,7 @@
 ---
 layout: post
 title:  ColdFusion RCE using WDDX deserialization - Story and details behind CVE-2023-26359 and CVE-2023-29300
-date:   2024-02-14 22:50:40 +0100
+date:   2024-02-19 10:50:40 +0100
 img_path: /assets/img/2024-02-14-ColdFusion-WDDX-2023/
 category: blogpost
 inadvisory: true
@@ -56,7 +56,7 @@ Based on those details, I was able to come up with the following conclusions:
 
 - *chain1* was tied to CVE-2023-26360
 - *chain2* was tied to CVE-2023-26359
-- **CVE-2023-26359 was used as a 0day**. And Patrick Vares who reported it actually did so after a thorough and nice investigation of two compromised ColdFusion servers. As of this writing, Adobe refused to indicate this in their bulletins, and I do believe the inclusion of CVE-2023-26359 in CISA KEV list was done after CrowdStrike reporting.
+- **CVE-2023-26359 was used as a 0day**. And Patrick Vares who reported it actually did so after a thorough and nice investigation of two compromised ColdFusion servers. As of this writing, Adobe refused to indicate this in their bulletins.
 - **All code changes in ColdFusion 2021 patch were pertaining to CVE-2023-26360. Somehow, CVE-2023-26359 is intact there.**
 
 # CVE-2023-26359 details
